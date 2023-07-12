@@ -1,6 +1,6 @@
 import { Strategy as GitHubStrategy } from 'passport-github2';
 import { GITHUB_CLIENT_ID, GITHUB_CLIENT_SECRET } from './secrets';
-import GHAuthUser from '../shared/GitHubAuthenticatedUser';
+import GHAuthUser from '../../shared/src/GitHubAuthenticatedUser';
 import { addKnownUser, fromGHAU } from './User';
 const callbackURL =
   process.env.NODE_ENV === 'production'

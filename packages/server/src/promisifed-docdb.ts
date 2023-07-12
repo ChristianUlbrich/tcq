@@ -9,7 +9,7 @@ import {
   NewDocument
 } from 'documentdb';
 import { CDB_SECRET } from './secrets';
-import Meeting from '../shared/Meeting';
+import Meeting from '../../shared/src/Meeting';
 
 const host = db.HOST;
 const masterKey = CDB_SECRET;

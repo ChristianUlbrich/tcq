@@ -5,8 +5,8 @@ export const SESSION_COLLECTION_ID = 'sessions';
 
 import { CDB_SECRET } from './secrets';
 import * as docdb from 'documentdb-typescript';
-import Speaker from '../shared/Speaker';
-import Meeting from '../shared/Meeting';
+import Speaker from '../../shared/src/Speaker';
+import Meeting from '../../shared/src/Meeting';
 import { DocumentResource } from 'documentdb-typescript/typings/_DocumentDB';
 
 const meetingsCollection = getMeetingsCollection();

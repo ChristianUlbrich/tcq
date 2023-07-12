@@ -1,7 +1,7 @@
-import User from '../shared/User';
-import GitHubAuthenticatedUser from '../shared/GitHubAuthenticatedUser';
+import User from '../../shared/src/User';
+import GitHubAuthenticatedUser from '../../shared/src/GitHubAuthenticatedUser';
 import axios from 'axios';
-import Meeting from '../shared/Meeting';
+import Meeting from '../../shared/src/Meeting';
 
 const knownUsers = new Map<string, User>();
 

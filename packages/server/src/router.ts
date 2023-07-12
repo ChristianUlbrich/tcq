@@ -3,7 +3,7 @@ import passport from './passport';
 import * as express from 'express';
 import uuid = require('uuid');
 import { isChair } from './chairs';
-import Meeting from '../shared/Meeting';
+import Meeting from '../../shared/src/Meeting';
 import { ensureLoggedIn } from 'connect-ensure-login';
 import { resolve as resolvePath } from 'path';
 import { promisify } from 'util';
