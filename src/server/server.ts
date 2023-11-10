@@ -1,6 +1,5 @@
 import * as secrets from './secrets';
 // important that this block come very early as appinsights shims many things
-// import client from './telemetry';
 
 import log from './logger';
 import * as express from 'express';
@@ -47,10 +46,6 @@ app.use(function requireHTTPS(req, res, next) {
   next();
 });
 
-// app.use(function (req, res, next) {
-//   client.trackNodeHttpRequest({ request: req, response: res });
-//   next();
-// });
 app.use(require('express-bunyan-logger')());
 app.use(bodyParser.json());
 app.use(session);

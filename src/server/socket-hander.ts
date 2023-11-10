@@ -13,7 +13,6 @@ import gha from './ghapi';
 const PRIORITIES: Speaker['type'][] = ['poo', 'question', 'reply', 'topic'];
 import * as uuid from 'uuid';
 import axios from 'axios';
-// import client from './telemetry';
 import { EmitEventNames } from 'strict-event-emitter-types';
 
 let socks = new Map<string, Set<Message.ServerSocket>>();
@@ -203,7 +202,6 @@ export default async function connection(socket: Message.ServerSocket) {
 
     meeting.agenda.push(agendaItem);
     await updateMeeting(meeting);
-    // client.trackEvent({ name: 'New Agenda Item' });
     emitAll(meetingId, 'newAgendaItem', agendaItem);
     respond(200);
   }
@@ -233,7 +231,6 @@ export default async function connection(socket: Message.ServerSocket) {
       position: index,
       speaker: speaker
     });
-    // client.trackEvent({ name: 'New Speaker' });
     respond(200);
   }
 
@@ -360,13 +357,6 @@ export default async function connection(socket: Message.ServerSocket) {
       if (!message) message = {};
       message.status = status;
       socket.emit('response', message);
-      // client.trackRequest({
-      //   resultCode: String(status),
-      //   name: 'WebSocket Handler: ' + fn.name,
-      //   duration: Date.now() - start,
-      //   url: socket.handshake.url,
-      //   success: String(status)[0] === '2'
-      // });
     }
 
     return function (...args: any[]) {
