@@ -12,7 +12,7 @@ import { createMeeting, getMeeting } from './db';
 import * as b64 from 'base64-url';
 import User, { getByUsername, fromGHAU, getByUsernames } from './User';
 const rf = promisify(readFile);
-import client from './telemetry';
+// import client from './telemetry';
 
 const router = Router();
 router.get('/', async (req, res) => {
@@ -116,19 +116,19 @@ router.post('/meetings', async (req, res) => {
   };
 
   await createMeeting(meeting);
-  client.trackEvent({ name: 'New Meeting' });
+  // client.trackEvent({ name: 'New Meeting' });
   res.send(meeting);
   res.end();
 });
 
 router.get('/login', function (req, res) {
-  client.trackEvent({ name: 'home-login', properties: { ref: req.query.ref } });
+  // client.trackEvent({ name: 'home-login', properties: { ref: req.query.ref } });
   res.redirect('/auth/github');
 });
 
 router.get('/auth/github', passport.authenticate('github'));
 router.get(
-  '/auth/github/callback',
+  '/api/auth/callback/github',
   passport.authenticate('github', { failureRedirect: '/login' }),
   function (req, res) {
     // Successful authentication, redirect home.

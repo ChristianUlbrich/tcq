@@ -1,7 +1,7 @@
-export const HOST = 'https://tcq.documents.azure.com:443/';
+export const HOST = 'https://cosmosrgeastusdd664bd9-af32-4d4e-b05fdb.documents.azure.com:443/';
 export const DATABASE_ID = 'tcq';
-export const COLLECTION_ID = 'items';
-export const SESSION_COLLECTION_ID = 'sessions';
+export const COLLECTION_ID = 'Items';
+export const SESSION_COLLECTION_ID = 'Sessions';
 
 import { CDB_SECRET } from './secrets';
 import * as docdb from 'documentdb-typescript';
@@ -18,6 +18,7 @@ export async function updateMeeting(meeting: Meeting) {
 
 export async function getMeeting(meetingId: string) {
   let collection = await meetingsCollection;
+  console.error('Get Meeting: ', collection);
 
   return (await collection.findDocumentAsync(meetingId)) as Meeting & DocumentResource;
 }

@@ -1,6 +1,6 @@
 import * as secrets from './secrets';
 // important that this block come very early as appinsights shims many things
-import client from './telemetry';
+// import client from './telemetry';
 
 import log from './logger';
 import * as express from 'express';
@@ -25,16 +25,16 @@ server.listen(port, function () {
 
 const DocumentDBStore = DocumentDBSession(Session);
 
-const sessionStore = new DocumentDBStore({
-  host: dbConstants.HOST,
-  database: dbConstants.DATABASE_ID,
-  collection: dbConstants.SESSION_COLLECTION_ID,
-  key: secrets.CDB_SECRET
-});
+// const sessionStore = new DocumentDBStore({
+//   host: dbConstants.HOST,
+//   database: dbConstants.DATABASE_ID,
+//   collection: dbConstants.SESSION_COLLECTION_ID,
+//   key: secrets.CDB_SECRET
+// });
 
 const session = Session({
   secret: secrets.SESSION_SECRET,
-  store: sessionStore,
+  // store: sessionStore,
   resave: true,
   saveUninitialized: true
 });
@@ -47,10 +47,10 @@ app.use(function requireHTTPS(req, res, next) {
   next();
 });
 
-app.use(function (req, res, next) {
-  client.trackNodeHttpRequest({ request: req, response: res });
-  next();
-});
+// app.use(function (req, res, next) {
+//   client.trackNodeHttpRequest({ request: req, response: res });
+//   next();
+// });
 app.use(require('express-bunyan-logger')());
 app.use(bodyParser.json());
 app.use(session);

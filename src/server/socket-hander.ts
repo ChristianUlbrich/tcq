@@ -13,7 +13,7 @@ import gha from './ghapi';
 const PRIORITIES: Speaker['type'][] = ['poo', 'question', 'reply', 'topic'];
 import * as uuid from 'uuid';
 import axios from 'axios';
-import client from './telemetry';
+// import client from './telemetry';
 import { EmitEventNames } from 'strict-event-emitter-types';
 
 let socks = new Map<string, Set<Message.ServerSocket>>();
@@ -157,7 +157,7 @@ export default async function connection(socket: Message.ServerSocket) {
     if (
       Math.abs(message.newIndex - message.oldIndex) === 1 &&
       meeting.queuedSpeakers[message.newIndex].type !==
-        meeting.queuedSpeakers[message.oldIndex].type
+      meeting.queuedSpeakers[message.oldIndex].type
     ) {
       // we're moving across a type boundary, so just update the type.
       meeting.queuedSpeakers[message.oldIndex].type = meeting.queuedSpeakers[message.newIndex].type;
@@ -203,7 +203,7 @@ export default async function connection(socket: Message.ServerSocket) {
 
     meeting.agenda.push(agendaItem);
     await updateMeeting(meeting);
-    client.trackEvent({ name: 'New Agenda Item' });
+    // client.trackEvent({ name: 'New Agenda Item' });
     emitAll(meetingId, 'newAgendaItem', agendaItem);
     respond(200);
   }
@@ -218,7 +218,7 @@ export default async function connection(socket: Message.ServerSocket) {
 
     const { currentSpeaker, queuedSpeakers } = meeting;
 
-    let index = queuedSpeakers.findIndex(function(queuedSpeaker) {
+    let index = queuedSpeakers.findIndex(function (queuedSpeaker) {
       return PRIORITIES.indexOf(queuedSpeaker.type) > PRIORITIES.indexOf(speaker.type);
     });
 
@@ -233,7 +233,7 @@ export default async function connection(socket: Message.ServerSocket) {
       position: index,
       speaker: speaker
     });
-    client.trackEvent({ name: 'New Speaker' });
+    // client.trackEvent({ name: 'New Speaker' });
     respond(200);
   }
 
@@ -250,10 +250,11 @@ export default async function connection(socket: Message.ServerSocket) {
 
     const { reactions } = meeting;
 
-    let index = reactions.findIndex(function(r) {
-      return r.reaction == reaction.reaction && r.user.ghid == reaction.user.ghid}
+    let index = reactions.findIndex(function (r) {
+      return r.reaction == reaction.reaction && r.user.ghid == reaction.user.ghid;
+    }
     );
-    
+
     if (index === -1) {
       reactions.push(reaction);
       await updateMeeting(meeting);
@@ -284,7 +285,7 @@ export default async function connection(socket: Message.ServerSocket) {
 
     const { queuedSpeakers } = meeting;
 
-    let index = queuedSpeakers.findIndex(function(queuedSpeaker) {
+    let index = queuedSpeakers.findIndex(function (queuedSpeaker) {
       return queuedSpeaker.id === message.id;
     });
 
@@ -359,16 +360,16 @@ export default async function connection(socket: Message.ServerSocket) {
       if (!message) message = {};
       message.status = status;
       socket.emit('response', message);
-      client.trackRequest({
-        resultCode: String(status),
-        name: 'WebSocket Handler: ' + fn.name,
-        duration: Date.now() - start,
-        url: socket.handshake.url,
-        success: String(status)[0] === '2'
-      });
+      // client.trackRequest({
+      //   resultCode: String(status),
+      //   name: 'WebSocket Handler: ' + fn.name,
+      //   duration: Date.now() - start,
+      //   url: socket.handshake.url,
+      //   success: String(status)[0] === '2'
+      // });
     }
 
-    return function(...args: any[]) {
+    return function (...args: any[]) {
       start = Date.now();
       fn.call(undefined, respond, ...args);
     };
@@ -388,7 +389,7 @@ interface Responder {
   (code: number, message?: object): void;
 }
 
-const emitAll = function(meetingId: string, type: EmitEventNames<Message.ServerSocket>, arg?: any) {
+const emitAll = function (meetingId: string, type: EmitEventNames<Message.ServerSocket>, arg?: any) {
   const ss = socks.get(meetingId);
   if (!ss) return;
 
