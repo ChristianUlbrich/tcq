@@ -1,7 +1,7 @@
-export const HOST = 'https://cosmosrgeastusdd664bd9-af32-4d4e-b05fdb.documents.azure.com:443/';
-export const DATABASE_ID = 'tcq';
-export const COLLECTION_ID = 'Items';
-export const SESSION_COLLECTION_ID = 'Sessions';
+export const HOST = process.env.DB_URI;
+export const DATABASE_ID = process.env.DB_NAME;
+export const COLLECTION_ID = process.env.DB_CONTAINER;
+export const SESSION_COLLECTION_ID = process.env.DB_CONTAINER_SESSIONS;
 
 import { CDB_SECRET } from './secrets';
 import * as docdb from 'documentdb-typescript';
@@ -30,6 +30,8 @@ export async function createMeeting(meeting: Meeting) {
 }
 
 export async function getMeetingsCollection() {
+  if (!COLLECTION_ID) throw new Error('Missing COLLECTION_ID');
+  if (!DATABASE_ID) throw new Error('Missing DATABASE_ID');
   return new docdb.Collection(COLLECTION_ID, DATABASE_ID, HOST, CDB_SECRET).openAsync();
 }
 
