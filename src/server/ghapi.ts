@@ -1,4 +1,4 @@
-import * as GHA from 'github';
+import GHA from 'github';
 
 var v: GHA.SearchUsersParams;
 

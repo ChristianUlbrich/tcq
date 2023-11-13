@@ -1,43 +1,67 @@
 export const HOST = process.env.DB_URI;
 export const DATABASE_ID = process.env.DB_NAME;
 export const COLLECTION_ID = process.env.DB_CONTAINER;
+export const PARTITION_KEY = process.env.DB_PARTITION_KEY;
 export const SESSION_COLLECTION_ID = process.env.DB_CONTAINER_SESSIONS;
 
-import { CDB_SECRET } from './secrets';
-import * as docdb from 'documentdb-typescript';
-import Meeting from '../shared/Meeting';
-import { DocumentResource } from 'documentdb-typescript/typings/_DocumentDB';
+import log from './logger.js';
+import { CDB_SECRET } from './secrets.js';
+import { CosmosClient, Resource } from '@azure/cosmos';
+import Meeting from '../shared/Meeting.js';
 
-const meetingsCollection = getMeetingsCollection();
-
-export async function updateMeeting(meeting: Meeting) {
-  let collection = await meetingsCollection;
-  await collection.storeDocumentAsync(meeting, docdb.StoreMode.UpdateOnly);
+if (!HOST) {
+  log.fatal('ERROR\tNo database endpoint. Set DB_URI.');
+  process.exit(1);
+}
+if (!DATABASE_ID) {
+  log.fatal('ERROR\tNo database name. Set DB_NAME.');
+  process.exit(1);
+}
+if (!COLLECTION_ID) {
+  log.fatal('ERROR\tNo database container / collection. Set DB_CONTAINER.');
+  process.exit(1);
 }
 
-export async function getMeeting(meetingId: string) {
-  let collection = await meetingsCollection;
-  console.error('Get Meeting: ', collection);
+const dbClient = new CosmosClient({
+  endpoint: HOST,
+  key: CDB_SECRET
+});
 
-  return (await collection.findDocumentAsync(meetingId)) as Meeting & DocumentResource;
+await dbClient
+  .databases
+  .createIfNotExists({ id: DATABASE_ID, maxThroughput: 1000 });
+await dbClient
+  .database(DATABASE_ID)
+  .containers.createIfNotExists({ id: COLLECTION_ID, partitionKey: PARTITION_KEY });
+
+async function upsertMeeting(meeting: Meeting) {
+  const { resource } = await dbClient
+    .database(DATABASE_ID!)
+    .container(COLLECTION_ID!)
+    .items
+    .upsert<Meeting>(meeting);
+  return resource;
 }
 
-export async function createMeeting(meeting: Meeting) {
-  let collection = await meetingsCollection;
-
-  return collection.storeDocumentAsync(meeting);
+async function updateMeeting(meeting: Meeting) {
+  await upsertMeeting(meeting);
 }
 
-export async function getMeetingsCollection() {
-  if (!COLLECTION_ID) throw new Error('Missing COLLECTION_ID');
-  if (!DATABASE_ID) throw new Error('Missing DATABASE_ID');
-  return new docdb.Collection(COLLECTION_ID, DATABASE_ID, HOST, CDB_SECRET).openAsync();
+async function getMeeting(meetingId: string): Promise<(Meeting & Resource) | undefined> {
+  const { resource } = await dbClient
+    .database(DATABASE_ID!)
+    .container(COLLECTION_ID!)
+    .item(meetingId, PARTITION_KEY)
+    .read<Meeting>();
+  return resource;
 }
 
-const reUUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
-function validUUID(seen: Set<string>, uuid: string) {
-  if (seen.has(uuid)) return false;
-  if (!reUUID.exec(uuid)) return false;
-
-  return true;
+async function createMeeting(meeting: Meeting): Promise<(Meeting & Resource) | undefined> {
+  return upsertMeeting(meeting);
 }
+
+export {
+  createMeeting,
+  getMeeting,
+  updateMeeting
+};

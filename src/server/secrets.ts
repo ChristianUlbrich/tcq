@@ -1,4 +1,4 @@
-import log from './logger';
+import log from './logger.js';
 
 export const GITHUB_CLIENT_ID = process.env.OAUTH_CLIENT_ID;
 export const GITHUB_CLIENT_SECRET = process.env.OAUTH_CLIENT_SECRET;

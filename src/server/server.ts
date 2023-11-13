@@ -1,13 +1,14 @@
-import * as secrets from './secrets';
-import log from './logger';
-import * as express from 'express';
-import passport from './passport';
-import routes from './router';
+import * as secrets from './secrets.js';
+import log from './logger.js';
+import express from 'express';
+import passport from './passport.js';
+import routes from './router.js';
 import { Server as socketio } from 'socket.io';
 import { Server } from 'http';
-import * as Session from 'express-session';
-import socketHandler from './socket-hander';
-import * as bodyParser from 'body-parser';
+import Session from 'express-session';
+import socketHandler from './socket-hander.js';
+import bodyParser from 'body-parser';
+import bunyan from 'express-bunyan-logger';
 
 const app = express();
 const server = new Server(app as any); // this seems to work, and I see docs about it, but typings complain
@@ -32,7 +33,7 @@ app.use(function requireHTTPS(req, res, next) {
   next();
 });
 
-app.use(require('express-bunyan-logger')());
+app.use(bunyan());
 app.use(bodyParser.json());
 app.use(session);
 app.use(passport.initialize());

@@ -1,12 +1,12 @@
-import Speaker from '../shared/Speaker';
-import AgendaItem from '../shared/AgendaItem';
-import User, { getByUsername } from './User';
-import Reaction from '../shared/Reaction';
-import GitHubAuthenticatedUser from '../shared/GitHubAuthenticatedUser';
-import { isChair } from './User';
-import * as Message from '../shared/Messages';
-import { updateMeeting, getMeeting } from './db';
-import gha from './ghapi';
+import Speaker from '../shared/Speaker.js';
+import AgendaItem from '../shared/AgendaItem.js';
+import User, { getByUsername } from './User.js';
+import Reaction from '../shared/Reaction.js';
+import GitHubAuthenticatedUser from '../shared/GitHubAuthenticatedUser.js';
+import { isChair } from './User.js';
+import * as Message from '../shared/Messages.js';
+import { updateMeeting, getMeeting } from './db.js';
+import gha from './ghapi.js';
 const PRIORITIES: Speaker['type'][] = ['poo', 'question', 'reply', 'topic'];
 import { v4 as uuid } from 'uuid';
 import { EmitEventNames } from 'strict-event-emitter-types';
@@ -48,7 +48,7 @@ export default async function connection(socket: Message.ServerSocket) {
 
   const meeting = await getMeeting(meetingId);
 
-  let state: Message.State = Object.keys(meeting)
+  let state: Message.State = Object.keys(meeting ?? {})
     .filter(k => k[0] !== '_')
     .reduce((s, k) => {
       (s as any)[k] = (meeting as any)[k];
@@ -72,6 +72,10 @@ export default async function connection(socket: Message.ServerSocket) {
 
   async function nextAgendaItem(respond: Responder, message: Message.NextAgendaItemRequest) {
     const meeting = await getMeeting(meetingId);
+    if (!meeting) {
+      respond(500, { message: 'Problem(s) finding meeting' });
+      return;
+    }
 
     if (meeting.currentAgendaItem && meeting.currentAgendaItem.id !== message.currentItemId) {
       respond(403, { message: 'Agenda item out of sync' });
@@ -102,6 +106,11 @@ export default async function connection(socket: Message.ServerSocket) {
 
   async function deleteAgendaItem(respond: Responder, message: Message.DeleteAgendaItem) {
     const meeting = await getMeeting(meetingId);
+    if (!meeting) {
+      respond(500, { message: 'Problem(s) finding meeting' });
+      return;
+    }
+
     if (!isChair(user, meeting)) {
       respond(403);
       return;
@@ -115,6 +124,11 @@ export default async function connection(socket: Message.ServerSocket) {
 
   async function reorderAgendaItem(respond: Responder, message: Message.ReorderAgendaItemRequest) {
     const meeting = await getMeeting(meetingId);
+    if (!meeting) {
+      respond(500, { message: 'Problem(s) finding meeting' });
+      return;
+    }
+
     if (!isChair(user, meeting)) {
       respond(403);
       return;
@@ -128,6 +142,11 @@ export default async function connection(socket: Message.ServerSocket) {
 
   async function reorderQueue(respond: Responder, message: Message.ReorderQueueRequest) {
     const meeting = await getMeeting(meetingId);
+    if (!meeting) {
+      respond(500, { message: 'Problem(s) finding meeting' });
+      return;
+    }
+
     if (!isChair(user, meeting)) {
       respond(403);
       return;
@@ -174,6 +193,11 @@ export default async function connection(socket: Message.ServerSocket) {
 
   async function newAgendaItem(respond: Responder, message: Message.NewAgendaItemRequest) {
     const meeting = await getMeeting(meetingId);
+    if (!meeting) {
+      respond(500, { message: 'Problem(s) finding meeting' });
+      return;
+    }
+
     if (!isChair(user, meeting)) {
       respond(403);
       return;
@@ -209,6 +233,10 @@ export default async function connection(socket: Message.ServerSocket) {
     };
 
     const meeting = await getMeeting(meetingId);
+    if (!meeting) {
+      respond(500, { message: 'Problem(s) finding meeting' });
+      return;
+    }
 
     const { currentSpeaker, queuedSpeakers } = meeting;
 
@@ -237,6 +265,11 @@ export default async function connection(socket: Message.ServerSocket) {
     };
 
     const meeting = await getMeeting(meetingId);
+    if (!meeting) {
+      respond(500, { message: 'Problem(s) finding meeting' });
+      return;
+    }
+
     if (!meeting.reactions) {
       meeting.reactions = [];
     }
@@ -262,6 +295,11 @@ export default async function connection(socket: Message.ServerSocket) {
 
   async function trackTemperature(respond: Responder, message: Message.TrackTemperatureRequest) {
     const meeting = await getMeeting(meetingId);
+    if (!meeting) {
+      respond(500, { message: 'Problem(s) finding meeting' });
+      return;
+    }
+
     if (!message.track) {
       meeting.reactions = [];
       await updateMeeting(meeting);
@@ -275,6 +313,10 @@ export default async function connection(socket: Message.ServerSocket) {
     message: Message.DeleteQueuedSpeakerRequest
   ) {
     const meeting = await getMeeting(meetingId);
+    if (!meeting) {
+      respond(500, { message: 'Problem(s) finding meeting' });
+      return;
+    }
 
     const { queuedSpeakers } = meeting;
 
@@ -302,6 +344,11 @@ export default async function connection(socket: Message.ServerSocket) {
 
   async function nextSpeaker(respond: Responder, message: Message.NextSpeakerRequest) {
     const meeting = await getMeeting(meetingId);
+    if (!meeting) {
+      respond(500, { message: 'Problem(s) finding meeting' });
+      return;
+    }
+
     if (
       user.ghid &&
       meeting.currentSpeaker &&
