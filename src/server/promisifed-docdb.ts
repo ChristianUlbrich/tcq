@@ -9,15 +9,11 @@ import {
   NewDocument
 } from 'documentdb';
 import { CDB_SECRET } from './secrets';
-import Meeting from '../shared/Meeting';
 
 const host = db.HOST;
 const masterKey = CDB_SECRET;
+if (!host) throw new Error('Missing DB_URI');
 const client = new DocumentClient(host, { masterKey: masterKey });
-
-const databaseDefinition = { id: db.DATABASE_ID };
-const collectionDefinition = { id: db.COLLECTION_ID };
-const documentDefinition = { id: 'hello world doc', content: 'Hello World!' };
 
 export function createDocument(
   collection: CollectionMeta,
@@ -102,7 +98,7 @@ function queryResolverRejecter<T>(
       reject(
         new Error(
           `Expected a single ${resourceType} of a given ID, got ${resource.length}:\n` +
-            JSON.stringify(resource)
+          JSON.stringify(resource)
         )
       );
     } else {

@@ -1,39 +1,25 @@
 import * as secrets from './secrets';
-// important that this block come very early as appinsights shims many things
-
 import log from './logger';
 import * as express from 'express';
 import passport from './passport';
 import routes from './router';
-import * as socketio from 'socket.io';
+import { Server as socketio } from 'socket.io';
 import { Server } from 'http';
 import * as Session from 'express-session';
 import socketHandler from './socket-hander';
-import DocumentDBSession = require('documentdb-session');
-import * as dbConstants from './db';
 import * as bodyParser from 'body-parser';
 
 const app = express();
 const server = new Server(app as any); // this seems to work, and I see docs about it, but typings complain
-const io = socketio(server, { perMessageDeflate: false });
+const io = new socketio(server, { perMessageDeflate: false });
 const port = process.env.PORT || 3000;
 log.info('Starting server');
 server.listen(port, function () {
   log.info('Application started and listening on port ' + port);
 });
 
-const DocumentDBStore = DocumentDBSession(Session);
-
-// const sessionStore = new DocumentDBStore({
-//   host: dbConstants.HOST,
-//   database: dbConstants.DATABASE_ID,
-//   collection: dbConstants.SESSION_COLLECTION_ID,
-//   key: secrets.CDB_SECRET
-// });
-
 const session = Session({
   secret: secrets.SESSION_SECRET,
-  // store: sessionStore,
   resave: true,
   saveUninitialized: true
 });

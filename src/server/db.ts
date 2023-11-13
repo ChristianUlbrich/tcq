@@ -5,7 +5,6 @@ export const SESSION_COLLECTION_ID = process.env.DB_CONTAINER_SESSIONS;
 
 import { CDB_SECRET } from './secrets';
 import * as docdb from 'documentdb-typescript';
-import Speaker from '../shared/Speaker';
 import Meeting from '../shared/Meeting';
 import { DocumentResource } from 'documentdb-typescript/typings/_DocumentDB';
 

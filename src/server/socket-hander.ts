@@ -1,18 +1,14 @@
-import Meeting from '../shared/Meeting';
 import Speaker from '../shared/Speaker';
 import AgendaItem from '../shared/AgendaItem';
 import User, { getByUsername } from './User';
-import Reaction, { ReactionTypes } from '../shared/Reaction';
+import Reaction from '../shared/Reaction';
 import GitHubAuthenticatedUser from '../shared/GitHubAuthenticatedUser';
-import * as socketio from 'socket.io';
 import { isChair } from './User';
 import * as Message from '../shared/Messages';
-import { updateMeeting, getMeeting, getMeetingsCollection } from './db';
-import { TopicTypes } from '../shared/Speaker';
+import { updateMeeting, getMeeting } from './db';
 import gha from './ghapi';
 const PRIORITIES: Speaker['type'][] = ['poo', 'question', 'reply', 'topic'];
-import * as uuid from 'uuid';
-import axios from 'axios';
+import { v4 as uuid } from 'uuid';
 import { EmitEventNames } from 'strict-event-emitter-types';
 
 let socks = new Map<string, Set<Message.ServerSocket>>();
