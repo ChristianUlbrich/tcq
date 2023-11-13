@@ -11,7 +11,7 @@ declare module '*.html' {
   export = withRender;
 }
 
-declare module 'vuedraggable' {
-  var x: any;
-  export = x;
-}
+// declare module 'vuedraggable' {
+//   var x: any;
+//   export = x;
+// }
