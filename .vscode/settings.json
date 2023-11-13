@@ -7,5 +7,6 @@
   "prettier.printWidth": 100,
   "prettier.singleQuote": true,
   "typescript.tsdk": "node_modules/typescript/lib",
-  "html.format.enable": false
+  "html.format.enable": false,
+  "conventionalCommits.scopes": ["tcq/client", "tcq/server"]
 }
