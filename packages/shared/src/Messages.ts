@@ -1,10 +1,11 @@
-import { TopicTypes } from './Speaker';
-import Meeting from './Meeting';
-import Speaker from './Speaker';
-import User from './User';
-import Reaction, { ReactionTypes } from './Reaction';
-import AgendaItem from './AgendaItem';
-import StrictEventEmitter, { StrictBroadcast } from 'strict-event-emitter-types';
+import * as SocketIOClient from 'socket.io-client';
+import * as SocketIO from 'socket.io';
+import { StrictBroadcast, StrictEventEmitter } from 'strict-event-emitter-types';
+import AgendaItem from './AgendaItem.js';
+import Meeting from './Meeting.js';
+import Reaction, { ReactionTypes } from './Reaction.js';
+import Speaker, { TopicTypes } from './Speaker.js';
+import User from './User.js';
 
 interface ServerEvents {
   newQueuedSpeakerRequest: NewQueuedSpeakerRequest;
@@ -97,7 +98,7 @@ export interface ReorderAgendaItemRequest {
   newIndex: number;
 }
 
-export interface UpdateQueuedSpeaker extends Speaker {}
+export interface UpdateQueuedSpeaker extends Speaker { }
 export interface State extends Meeting {
   user: User;
 }
@@ -118,7 +119,7 @@ export interface TrackTemperatureRequest {
   track: boolean;
 }
 
-export interface NextAgendaItem extends AgendaItem {}
+export interface NextAgendaItem extends AgendaItem { }
 export type NewCurrentSpeaker = Speaker | undefined;
 export type NewCurrentTopic = Speaker | undefined;
 export type NewReaction = Reaction;

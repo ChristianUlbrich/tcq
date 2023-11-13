@@ -4,12 +4,16 @@
   "description": "Pkg for types only",
   "main": "index.js",
   "author": "",
-  "license": "ISC",
+  "license": "Apache-2.0",
+  "type": "module",
   "scripts": {
-    "build": "echo \"@tc39/tcq-shared: no build\"",
+    "build": "tsc",
     "dev": "echo \"@tc39/tcq-shared: no dev script\""
   },
   "devDependencies": {
-    "strict-event-emitter-types": "2.0.0"
+    "socket.io": "4.7.2",
+    "socket.io-client": "4.7.2",
+    "strict-event-emitter-types": "2.0.0",
+    "typescript": "5.2.2"
   }
 }

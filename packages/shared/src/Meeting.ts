@@ -1,7 +1,7 @@
-import Speaker from './Speaker';
-import Reaction from './Reaction';
-import AgendaItem from './AgendaItem';
-import User from './User';
+import Speaker from './Speaker.js';
+import Reaction from './Reaction.js';
+import AgendaItem from './AgendaItem.js';
+import User from './User.js';
 interface Meeting {
   chairs: User[];
   currentAgendaItem: AgendaItem | undefined;
