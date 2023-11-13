@@ -24,16 +24,16 @@ server.listen(port, function () {
 
 const DocumentDBStore = DocumentDBSession(Session);
 
-const sessionStore = new DocumentDBStore({
-  host: dbConstants.HOST,
-  database: dbConstants.DATABASE_ID,
-  collection: dbConstants.SESSION_COLLECTION_ID,
-  key: secrets.CDB_SECRET
-});
+// const sessionStore = new DocumentDBStore({
+//   host: dbConstants.HOST,
+//   database: dbConstants.DATABASE_ID,
+//   collection: dbConstants.SESSION_COLLECTION_ID,
+//   key: secrets.CDB_SECRET
+// });
 
 const session = Session({
   secret: secrets.SESSION_SECRET,
-  store: sessionStore,
+  // store: sessionStore,
   resave: true,
   saveUninitialized: true
 });
@@ -46,9 +46,6 @@ app.use(function requireHTTPS(req, res, next) {
   next();
 });
 
-app.use(function (req, res, next) {
-  next();
-});
 app.use(require('express-bunyan-logger')());
 app.use(bodyParser.json());
 app.use(session);

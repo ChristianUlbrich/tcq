@@ -13,7 +13,6 @@ import * as b64 from 'base64-url';
 import User, { getByUsername, fromGHAU, getByUsernames } from './User';
 const rf = promisify(readFile);
 
-
 const router = Router();
 router.get('/', async (req, res) => {
   if (req.isAuthenticated()) {
@@ -126,7 +125,7 @@ router.get('/login', function (req, res) {
 
 router.get('/auth/github', passport.authenticate('github'));
 router.get(
-  '/auth/github/callback',
+  '/api/auth/callback/github',
   passport.authenticate('github', { failureRedirect: '/login' }),
   function (req, res) {
     // Successful authentication, redirect home.

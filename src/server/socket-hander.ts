@@ -156,7 +156,7 @@ export default async function connection(socket: Message.ServerSocket) {
     if (
       Math.abs(message.newIndex - message.oldIndex) === 1 &&
       meeting.queuedSpeakers[message.newIndex].type !==
-        meeting.queuedSpeakers[message.oldIndex].type
+      meeting.queuedSpeakers[message.oldIndex].type
     ) {
       // we're moving across a type boundary, so just update the type.
       meeting.queuedSpeakers[message.oldIndex].type = meeting.queuedSpeakers[message.newIndex].type;
@@ -216,7 +216,7 @@ export default async function connection(socket: Message.ServerSocket) {
 
     const { currentSpeaker, queuedSpeakers } = meeting;
 
-    let index = queuedSpeakers.findIndex(function(queuedSpeaker) {
+    let index = queuedSpeakers.findIndex(function (queuedSpeaker) {
       return PRIORITIES.indexOf(queuedSpeaker.type) > PRIORITIES.indexOf(speaker.type);
     });
 
@@ -247,10 +247,11 @@ export default async function connection(socket: Message.ServerSocket) {
 
     const { reactions } = meeting;
 
-    let index = reactions.findIndex(function(r) {
-      return r.reaction == reaction.reaction && r.user.ghid == reaction.user.ghid}
+    let index = reactions.findIndex(function (r) {
+      return r.reaction == reaction.reaction && r.user.ghid == reaction.user.ghid;
+    }
     );
-    
+
     if (index === -1) {
       reactions.push(reaction);
       await updateMeeting(meeting);
@@ -281,7 +282,7 @@ export default async function connection(socket: Message.ServerSocket) {
 
     const { queuedSpeakers } = meeting;
 
-    let index = queuedSpeakers.findIndex(function(queuedSpeaker) {
+    let index = queuedSpeakers.findIndex(function (queuedSpeaker) {
       return queuedSpeaker.id === message.id;
     });
 
@@ -356,10 +357,9 @@ export default async function connection(socket: Message.ServerSocket) {
       if (!message) message = {};
       message.status = status;
       socket.emit('response', message);
-
     }
 
-    return function(...args: any[]) {
+    return function (...args: any[]) {
       start = Date.now();
       fn.call(undefined, respond, ...args);
     };
@@ -379,7 +379,7 @@ interface Responder {
   (code: number, message?: object): void;
 }
 
-const emitAll = function(meetingId: string, type: EmitEventNames<Message.ServerSocket>, arg?: any) {
+const emitAll = function (meetingId: string, type: EmitEventNames<Message.ServerSocket>, arg?: any) {
   const ss = socks.get(meetingId);
   if (!ss) return;
 

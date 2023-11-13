@@ -2,10 +2,7 @@ import { Strategy as GitHubStrategy } from 'passport-github2';
 import { GITHUB_CLIENT_ID, GITHUB_CLIENT_SECRET } from './secrets';
 import GHAuthUser from '../shared/GitHubAuthenticatedUser';
 import { addKnownUser, fromGHAU } from './User';
-const callbackURL =
-  process.env.NODE_ENV === 'production'
-    ? 'http://tcq.app/auth/github/callback'
-    : 'http://127.0.0.1:3000/auth/github/callback';
+const callbackURL = process.env.OAUTH_CALLBACK_URL;
 
 export default new GitHubStrategy(
   {
