@@ -1,0 +1,11 @@
+{
+  "name": "@tc39/tcq-shared",
+  "version": "1.0.0",
+  "description": "Pkg for types only",
+  "main": "index.js",
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {
+    "strict-event-emitter-types": "2.0.0"
+  }
+}

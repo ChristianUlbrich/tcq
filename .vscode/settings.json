@@ -8,5 +8,5 @@
   "prettier.singleQuote": true,
   "typescript.tsdk": "node_modules/typescript/lib",
   "html.format.enable": false,
-  "conventionalCommits.scopes": ["tcq/client", "tcq/server"]
+  "conventionalCommits.scopes": ["client", "server", "shared"]
 }

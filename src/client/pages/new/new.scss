@@ -1,8 +1,0 @@
-$navbar-background-color: #fed;
-$navbar-item-hover-background-color: lighten($navbar-background-color, 10%);
-@import '~bulma';
-@import '../../navbar.scss';
-
-.box {
-  min-height: 200px;
-}
