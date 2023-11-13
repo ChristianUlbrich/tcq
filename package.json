@@ -1,5 +1,5 @@
 {
-  "name": "tcq",
+  "name": "@tc39/tcq",
   "version": "1.0.0",
   "private": true,
   "repository": {
@@ -12,6 +12,14 @@
     {
       "name": "Daniel Rosenwasser",
       "url": "https://github.com/DanielRosenwasser"
+    },
+    {
+      "name": "Christian Ulbrich",
+      "url": "https://github.com/ChristianUlbrich"
+    },
+    {
+      "name": "Tom Kopp",
+      "url": "https://github.com/TomKopp"
     }
   ],
   "license": "Apache-2.0",
