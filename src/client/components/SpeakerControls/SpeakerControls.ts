@@ -2,7 +2,7 @@ import Vue from 'vue';
 import { TopicTypes } from '../../../shared/Speaker';
 import template from './SpeakerControls.html';
 import * as Message from '../../../shared/Messages';
-import uuid from 'uuid';
+import { v4 as uuid } from 'uuid';
 import './SpeakerControls.scss';
 import { request } from '../../ClientSocket';
 

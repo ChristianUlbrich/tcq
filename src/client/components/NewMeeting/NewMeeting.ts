@@ -1,6 +1,8 @@
 import Vue from 'vue';
 import template from './NewMeeting.html';
-import axios from 'axios';
+import { Axios } from 'axios';
+
+const axios = new Axios();
 
 export const NewMeeting = template(
   Vue.extend({

@@ -1,11 +1,13 @@
 import Vue from 'vue';
 import template from './JoinMeeting.html';
-import axios from 'axios';
+import { Axios } from 'axios';
 import User from '../../../shared/User';
+
+const axios = new Axios();
 
 export const JoinMeeting = template(
   Vue.extend({
-    data: function() {
+    data: function () {
       return {
         meetingId: '',
         helpText: '4 characters',

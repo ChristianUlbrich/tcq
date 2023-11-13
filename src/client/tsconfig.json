@@ -2,9 +2,9 @@
   "extends": "../tsconfig.base.json",
   "compilerOptions": {
     "outDir": "../../dist/client",
-    "lib": ["es6", "dom"],
+    "lib": ["ESNext", "dom"],
     "sourceMap": true,
-    "target": "es5",
+    "target": "ES2022",
     "module": "esnext",
     "allowSyntheticDefaultImports": true
   }

@@ -1,17 +1,19 @@
 import { Router } from 'express';
-import passport from './passport';
-import * as express from 'express';
-import uuid = require('uuid');
-import { isChair } from './chairs';
-import Meeting from '../shared/Meeting';
-import { ensureLoggedIn } from 'connect-ensure-login';
+import passport from './passport.js';
+import { isChair } from './chairs.js';
+import Meeting from '../shared/Meeting.js';
 import { resolve as resolvePath } from 'path';
 import { promisify } from 'util';
 import { readFile } from 'fs';
-import { createMeeting, getMeeting } from './db';
+import { createMeeting, getMeeting } from './db.js';
 import * as b64 from 'base64-url';
-import User, { getByUsername, fromGHAU, getByUsernames } from './User';
+import User, { fromGHAU, getByUsernames } from './User.js';
+import log from './logger.js';
 const rf = promisify(readFile);
+
+import { dirname } from 'node:path';
+import { fileURLToPath } from 'node:url';
+const __dirname = dirname(fileURLToPath(import.meta.url));
 
 const router = Router();
 router.get('/', async (req, res) => {
@@ -139,16 +141,18 @@ router.get(
 );
 
 router.get('/logout', function (req, res) {
-  req.logout();
-  if (req.session) {
-    req.session.destroy(() => {
-      // TODO: Handle errors here?
+  req.logout({ keepSessionInfo: false }, (err) => {
+    log.warn('Something went wrong during logout.');
+    if (req.session) {
+      req.session.destroy(() => {
+        // TODO: Handle errors here?
+        res.redirect('/');
+      });
+    } else {
+      // not sure this branch happens
       res.redirect('/');
-    });
-  } else {
-    // not sure this branch happens
-    res.redirect('/');
-  }
+    }
+  });
 });
 
 export default router;

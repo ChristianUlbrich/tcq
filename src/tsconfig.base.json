@@ -2,6 +2,6 @@
   "compilerOptions": {
     "forceConsistentCasingInFileNames": true,
     "strict": true,
-    "moduleResolution": "node"
+    "moduleResolution": "NodeNext"
   }
 }

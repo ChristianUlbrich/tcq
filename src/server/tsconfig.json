@@ -2,8 +2,8 @@
   "extends": "../tsconfig.base.json",
   "compilerOptions": {
     "outDir": "../../dist",
-    "lib": ["es2017"],
-    "target": "es5",
-    "module": "commonjs"
+    "lib": ["ESNext"],
+    "target": "ES2022",
+    "module": "NodeNext"
   }
 }

@@ -1,8 +1,8 @@
-import * as GHA from 'github';
+import GHA from 'github';
 
 var v: GHA.SearchUsersParams;
 
-export default function(token: string) {
+export default function (token: string) {
   const gha = new GHA();
   gha.authenticate({
     type: 'oauth',
