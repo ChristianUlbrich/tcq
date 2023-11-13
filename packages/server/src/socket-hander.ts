@@ -1,10 +1,10 @@
-import Speaker from '../shared/Speaker.js';
-import AgendaItem from '../shared/AgendaItem.js';
+import Speaker from '../../shared/dist/Speaker.js';
+import AgendaItem from '../../shared/dist/AgendaItem.js';
 import User, { getByUsername } from './User.js';
-import Reaction from '../shared/Reaction.js';
-import GitHubAuthenticatedUser from '../shared/GitHubAuthenticatedUser.js';
+import Reaction from '../../shared/dist/Reaction.js';
+import GitHubAuthenticatedUser from '../../shared/dist/GitHubAuthenticatedUser.js';
 import { isChair } from './User.js';
-import * as Message from '../shared/Messages.js';
+import * as Message from '../../shared/dist/Messages.js';
 import { updateMeeting, getMeeting } from './db.js';
 import gha from './ghapi.js';
 const PRIORITIES: Speaker['type'][] = ['poo', 'question', 'reply', 'topic'];

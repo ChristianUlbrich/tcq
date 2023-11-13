@@ -1,7 +1,7 @@
 import { Router } from 'express';
 import passport from './passport.js';
 import { isChair } from './chairs.js';
-import Meeting from '../shared/Meeting.js';
+import Meeting from '../../shared/dist/Meeting.js';
 import { resolve as resolvePath } from 'path';
 import { promisify } from 'util';
 import { readFile } from 'fs';

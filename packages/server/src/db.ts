@@ -7,7 +7,7 @@ export const SESSION_COLLECTION_ID = process.env.DB_CONTAINER_SESSIONS;
 import log from './logger.js';
 import { CDB_SECRET } from './secrets.js';
 import { CosmosClient, Resource } from '@azure/cosmos';
-import Meeting from '../shared/Meeting.js';
+import Meeting from '../../shared/dist/Meeting.js';
 
 if (!HOST) {
   log.fatal('ERROR\tNo database endpoint. Set DB_URI.');
