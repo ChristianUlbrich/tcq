@@ -5,6 +5,10 @@
   "main": "index.js",
   "author": "",
   "license": "ISC",
+  "scripts": {
+    "build": "echo \"@tc39/tcq-shared: no build\"",
+    "dev": "echo \"@tc39/tcq-shared: no dev script\""
+  },
   "devDependencies": {
     "strict-event-emitter-types": "2.0.0"
   }

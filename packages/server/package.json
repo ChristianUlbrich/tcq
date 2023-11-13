@@ -8,8 +8,8 @@
   "description": "A TC39 Discussion Queue",
   "main": "dist/server/server.js",
   "scripts": {
-    "build-backend": "tsc",
-    "start": "node -r dotenv/config dist/server/server.js | \"./node_modules/.bin/bunyan\""
+    "build": "tsc",
+    "dev": "node -r dotenv/config dist/server/server.js | \"./node_modules/.bin/bunyan\""
   },
   "author": "Brian Terlson",
   "contributors": [
