@@ -1,0 +1,20 @@
+{
+  "chairs": [
+    {
+      "name": "Tom Kopp",
+      "organization": "@zalari ",
+      "ghid": 5657539,
+      "ghUsername": "TomKopp"
+    }
+  ],
+  "agenda": [],
+  "queuedSpeakers": [],
+  "reactions": [],
+  "trackTemperature": false,
+  "id": "YbdC",
+  "_rid": "n4V8AOWhAqQCAAAAAAAAAA==",
+  "_self": "dbs/n4V8AA==/colls/n4V8AOWhAqQ=/docs/n4V8AOWhAqQCAAAAAAAAAA==/",
+  "_etag": "\"f1032587-0000-0100-0000-654e12020000\"",
+  "_attachments": "attachments/",
+  "_ts": 1699615234
+}
