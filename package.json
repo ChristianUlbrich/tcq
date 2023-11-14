@@ -25,5 +25,9 @@
   "license": "Apache-2.0",
   "workspaces": [
     "packages/*"
-  ]
+  ],
+  "scripts": {
+    "build": "npm run --ws build",
+    "dev": "npm run --ws dev"
+  }
 }

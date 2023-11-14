@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref } from 'vue';
+import { ref, toValue } from 'vue';
 import axios from 'axios';
 
 const meetingId = ref('');
@@ -7,25 +7,26 @@ const helpText = ref('4 characters');
 const hasError = ref(false);
 
 const joinMeeting = async function () {
-  console.log('MeetingId', meetingId);
-  if (meetingId.length !== 4) {
+  const mId = toValue(meetingId);
+  console.log('MeetingId', mId);
+  if (mId.length !== 4) {
     helpText.value = 'To restate: must be 4 characters';
     hasError.value = true;
     return;
   }
 
-  try {
-    let res = await axios.head('/meeting/' + this.meetingId);
-  } catch (e) {
-    if (e.response && e.response.status === 404) {
-      helpText.value = 'Meeting not found';
-      hasError.value = true;
-      return;
-    }
-  }
+  // try {
+  //   let res = await axios.head('/meeting/' + mId);
+  // } catch (e) {
+  //   if (e.response && e.response.status === 404) {
+  //     helpText.value = 'Meeting not found';
+  //     hasError.value = true;
+  //     return;
+  //   }
+  // }
 
   // TODO: make this use the router instead of href...
-  document.location.href = '/meeting/' + this.meetingId;
+  document.location.href = '/#/meeting/' + mId;
 };
 </script>
 <template>

@@ -1,6 +1,6 @@
 import { Strategy as GitHubStrategy } from 'passport-github2';
 import { GITHUB_CLIENT_ID, GITHUB_CLIENT_SECRET } from './secrets.js';
-import GHAuthUser from '../shared/GitHubAuthenticatedUser.js';
+import GHAuthUser from '../../shared/dist/GitHubAuthenticatedUser.js';
 import { addKnownUser, fromGHAU } from './User.js';
 const callbackURL = process.env.OAUTH_CALLBACK_URL;
 

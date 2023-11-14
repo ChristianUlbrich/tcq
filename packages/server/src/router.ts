@@ -1,75 +1,17 @@
 import { Router } from 'express';
 import passport from './passport.js';
-import { isChair } from './chairs.js';
-import Meeting from '../shared/Meeting.js';
-import { resolve as resolvePath } from 'path';
-import { promisify } from 'util';
-import { readFile } from 'fs';
+import Meeting from '../../shared/dist/Meeting.js';
 import { createMeeting, getMeeting } from './db.js';
 import * as b64 from 'base64-url';
-import User, { fromGHAU, getByUsernames } from './User.js';
+import User, { getByUsernames } from './User.js';
 import log from './logger.js';
-const rf = promisify(readFile);
-
-import { dirname } from 'node:path';
-import { fileURLToPath } from 'node:url';
-const __dirname = dirname(fileURLToPath(import.meta.url));
 
 const router = Router();
-router.get('/', async (req, res) => {
-  if (req.isAuthenticated()) {
-    let user = fromGHAU(req.user);
-
-    let path = resolvePath(__dirname, '../client/new.html');
-    let contents = await rf(path, { encoding: 'utf8' });
-    contents = contents.replace(
-      '/head>',
-      '/head><script>window.user = ' + JSON.stringify(user) + '</' + 'script>'
-    );
-    res.send(contents);
-    res.end();
-  } else {
-    let path = resolvePath(__dirname, '../client/home.html');
-    let contents = await rf(path, { encoding: 'utf8' });
-    res.send(contents);
-    res.end();
-  }
-});
-
-router.get('/meeting/:id', async (req, res) => {
-  if (!req.isAuthenticated()) {
-    req.session!.meetingId = req.params.id;
-    res.redirect('/login');
-    return;
-  }
-
-  let meeting;
-  try {
-    meeting = await getMeeting(req.params.id);
-  } catch (e) {
-    res.status(404);
-    res.send('Meeting not found.');
-    res.end();
-    return;
-  }
-
-  let path = resolvePath(__dirname, '../client/meeting.html');
-  let contents = await rf(path, { encoding: 'utf8' });
-  let clientData = `<script>window.ghid = "${req.user.ghid}"; window.isChair = ${isChair(
-    req.user.ghid
-  )}</script>`;
-
-  // insert client data script prior to the first script so this data is available.
-  let slicePos = contents.indexOf('<script');
-  contents = contents.slice(0, slicePos) + clientData + contents.slice(slicePos);
-  res.send(contents);
-  res.end();
-});
 
 router.post('/meetings', async (req, res) => {
   res.contentType('json');
-  let chairs: string = req.body.chairs.trim();
 
+  let chairs: string = req.body.chairs;
   if (typeof chairs !== 'string') {
     res.status(400);
     res.send({ message: 'Must specify chairs' });
@@ -78,6 +20,7 @@ router.post('/meetings', async (req, res) => {
   }
 
   // split by commas, trim, and replace leading @ from usernames
+  chairs = chairs.trim();
   let usernames: string[] = [];
   if (chairs.length > 0) {
     usernames = chairs.split(',').map(s => s.trim().replace(/^@/, ''));
@@ -121,21 +64,17 @@ router.post('/meetings', async (req, res) => {
   res.end();
 });
 
-router.get('/login', function (req, res) {
-  res.redirect('/auth/github');
-});
-
-router.get('/auth/github', passport.authenticate('github'));
+router.get('/login', passport.authenticate('github'));
 router.get(
   '/api/auth/callback/github',
   passport.authenticate('github', { failureRedirect: '/login' }),
   function (req, res) {
     // Successful authentication, redirect home.
     if (req.session!.meetingId) {
-      res.redirect('/meeting/' + req.session!.meetingId);
+      res.redirect('/#/meeting/' + req.session!.meetingId);
       delete req.session!.meetingId;
     } else {
-      res.redirect('/');
+      res.redirect('/#/new');
     }
   }
 );

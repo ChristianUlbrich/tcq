@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref } from 'vue';
+import { ref, toValue } from 'vue';
 import axios from 'axios';
 
 const errorMessage = ref('');
@@ -11,7 +11,7 @@ const newMeeting = async function () {
 
   try {
     res = await axios.post('/meetings', {
-      chairs,
+      chairs: toValue(chairs),
     });
   } catch (e) {
     errorMessage.value = e.response.data.message;
@@ -19,7 +19,7 @@ const newMeeting = async function () {
   }
   // TODO: hook up with router... instead of directly modifying href :)
   let { id } = res.data;
-  document.location.href = '/meeting/' + id;
+  document.location.href = '/#/meeting/' + id;
 };
 </script>
 <template>
