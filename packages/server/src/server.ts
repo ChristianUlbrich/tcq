@@ -10,10 +10,20 @@ import socketHandler from './socket-hander.js';
 import bodyParser from 'body-parser';
 import bunyan from 'express-bunyan-logger';
 
+import { dirname, resolve } from 'node:path';
+import { fileURLToPath } from 'node:url';
+const __dirname = dirname(fileURLToPath(import.meta.url));
+
 const app = express();
 const server = new Server(app as any); // this seems to work, and I see docs about it, but typings complain
 const io = new socketio(server, { perMessageDeflate: false });
-const port = process.env.PORT || 3000;
+
+const port = process.env.PORT;
+if (!port) {
+  log.fatal('ERROR\tNo server port. Set PORT.');
+  process.exit(1);
+}
+
 log.info('Starting server');
 server.listen(port, function () {
   log.info('Application started and listening on port ' + port);
@@ -39,7 +49,7 @@ app.use(session);
 app.use(passport.initialize());
 app.use(passport.session());
 app.use(routes);
-app.use(express.static('dist/client/'));
+app.all('/*', express.static(resolve(__dirname, '../../client/dist/')));
 
 io.use(function (socket, next) {
   var req = socket.handshake;
