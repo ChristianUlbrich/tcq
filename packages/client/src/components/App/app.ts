@@ -42,7 +42,7 @@ interface AdditionalAppState {
 }
 
 let AppComponent = Vue.extend({
-  data: function() {
+  data: function () {
     return {
       id: '',
       isChair: false,
@@ -58,8 +58,8 @@ let AppComponent = Vue.extend({
       view: 'agenda',
       timeboxEnd: undefined,
       timeboxSecondsLeft: undefined,
-      notifyRequestFailure: () => {},
-      notifyRequestSuccess: () => {}
+      notifyRequestFailure: () => { },
+      notifyRequestSuccess: () => { }
     } as Meeting & AdditionalAppState;
   },
   components: {
@@ -112,7 +112,7 @@ let AppComponent = Vue.extend({
     });
 
     socket.on('deleteQueuedSpeaker', data => {
-      let index = this.queuedSpeakers.findIndex(function(queuedSpeaker) {
+      let index = this.queuedSpeakers.findIndex(function (queuedSpeaker) {
         return queuedSpeaker.id === data.id;
       });
       this.queuedSpeakers.splice(index, 1);
@@ -124,14 +124,14 @@ let AppComponent = Vue.extend({
     });
 
     socket.on('newReaction', data => {
-      console.log("new", data)
-      console.log(this.reactions)
+      console.log("new", data);
+      console.log(this.reactions);
       this.reactions.push(data);
     });
-    
+
     socket.on('deleteReaction', data => {
-      let index = this.reactions.findIndex((r: Reaction) => {   
-        return r.reaction == data.reaction && r.user.ghid == data.user.ghid
+      let index = this.reactions.findIndex((r: Reaction) => {
+        return r.reaction == data.reaction && r.user.ghid == data.user.ghid;
       });
       this.reactions.splice(index, 1);
     });

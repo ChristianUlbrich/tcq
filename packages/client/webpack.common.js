@@ -9,22 +9,14 @@ var extractSass = new ExtractTextPlugin({
   ignoreOrder: true
 });
 
-function resolve(dir) {
-  return path.join(__dirname, '..', dir);
-}
-
-function resolve(dir) {
-  return path.join(__dirname, '..', dir);
-}
-
 module.exports = {
   entry: {
-    app: './src/client/pages/meeting/meeting.ts',
-    home: './src/client/pages/home/home.ts',
-    new: './src/client/pages/new/new.ts'
+    app: './src/pages/meeting/meeting.ts',
+    home: './src/pages/home/home.ts',
+    new: './src/pages/new/new.ts'
   },
   output: {
-    path: path.resolve(__dirname, '../../dist/client/'),
+    path: path.resolve(__dirname, 'dist'),
     filename: '[name].build.js',
     publicPath: '/'
   },
@@ -39,9 +31,9 @@ module.exports = {
         test: /\.html$/,
         loader: 'vue-template-loader',
         exclude: [
-          resolve('client/pages/meeting/meeting.html'),
-          resolve('client/pages/home/home.html'),
-          resolve('client/pages/new/new.html')
+          path.resolve(__dirname, 'src/pages/meeting/meeting.html'),
+          path.resolve(__dirname, 'src/pages/home/home.html'),
+          path.resolve(__dirname, 'src/pages/new/new.html')
         ],
         options: {
           scoped: true
@@ -80,18 +72,18 @@ module.exports = {
     new HtmlWebpackPlugin({
       filename: './meeting.html',
       chunks: ['common', 'app'],
-      template: './src/client/pages/meeting/meeting.html'
+      template: './src/pages/meeting/meeting.html'
     }),
     new HtmlWebpackPlugin({
       filename: './new.html',
       chunks: ['common', 'new'],
-      template: './src/client/pages/new/new.html'
+      template: './src/pages/new/new.html'
     }),
     new HtmlWebpackPlugin({
       filename: './home.html',
       chunks: ['common', 'home'],
       inject: 'head',
-      template: './src/client/pages/home/home.html'
+      template: './src/pages/home/home.html'
     }),
     new webpack.optimize.CommonsChunkPlugin({
       name: 'common'
