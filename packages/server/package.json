@@ -6,10 +6,10 @@
     "url": "https://github.com/bterlson/tcq"
   },
   "description": "A TC39 Discussion Queue",
-  "main": "dist/server/server.js",
+  "main": "dist/server.js",
   "scripts": {
     "build": "tsc",
-    "dev": "node -r dotenv/config dist/server/server.js | \"./node_modules/.bin/bunyan\""
+    "dev": "node -r dotenv/config dist/server.js"
   },
   "author": "Brian Terlson",
   "contributors": [
