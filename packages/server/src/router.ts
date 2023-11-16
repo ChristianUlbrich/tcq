@@ -1,10 +1,15 @@
-import { Router } from 'express';
+import express, { Router } from 'express';
 import passport from './passport.js';
 import Meeting from '../../shared/dist/Meeting.js';
 import { createMeeting, getMeeting } from './db.js';
 import * as b64 from 'base64-url';
-import User, { getByUsernames } from './User.js';
+import User, { fromGHAU, getByUsernames } from './User.js';
 import log from './logger.js';
+
+import { dirname, resolve } from 'node:path';
+import { fileURLToPath } from 'node:url';
+import { isChair } from './chairs.js';
+const __dirname = dirname(fileURLToPath(import.meta.url));
 
 const router = Router();
 
@@ -71,10 +76,10 @@ router.get(
   function (req, res) {
     // Successful authentication, redirect home.
     if (req.session!.meetingId) {
-      res.redirect('/#/meeting/' + req.session!.meetingId);
+      res.redirect('/meeting/' + req.session!.meetingId);
       delete req.session!.meetingId;
     } else {
-      res.redirect('/#/new');
+      res.redirect('/new');
     }
   }
 );
@@ -93,5 +98,58 @@ router.get('/logout', function (req, res) {
     }
   });
 });
+
+
+router.get('/', (req, res) => {
+  res.sendFile(resolve(__dirname, '../../client/dist/home.html'));
+});
+
+router.get('/api/user', (req, res) => {
+  if (req.isAuthenticated()) {
+    let user = fromGHAU(req.user);
+    user.isChair = isChair(user.ghid);
+    res.json(user);
+  } else {
+    res.sendStatus(401);
+  }
+});
+
+// router.get('/api/chairs', (req, res) => {
+//   if (req.isAuthenticated()) {
+//     let user = fromGHAU(req.user);
+//     res.json(user);
+//   } else {
+//     res.sendStatus(401);
+//   }
+// });
+
+router.all(/^\/new(\.html)?$/, (req, res, next) => {
+  if (req.isAuthenticated()) next();
+  else res.redirect('/');
+}, (req, res) => {
+  res.sendFile(resolve(__dirname, '../../client/dist/new.html'));
+});
+
+router.all('/meeting/:id', (req, res, next) => {
+  if (req.isAuthenticated()) {
+    next();
+  } else {
+    req.session.meetingId = req.params.id;
+    res.redirect('/login');
+  }
+}, async (req, res, next) => {
+  try {
+    const res = await getMeeting(req.params.id);
+    console.debug(' --------------------- ');
+    console.debug(res);
+    console.debug(' --------------------- ');
+    next();
+  } catch (error) {
+    res.sendStatus(404);
+  }
+}, (req, res) => {
+  res.sendFile(resolve(__dirname, '../../client/dist/meeting.html'));
+});
+router.all('/*', express.static(resolve(__dirname, '../../client/dist/')));
 
 export default router;

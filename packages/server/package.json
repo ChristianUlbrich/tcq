@@ -9,7 +9,8 @@
   "main": "dist/server.js",
   "scripts": {
     "build": "tsc",
-    "dev": "node -r dotenv/config dist/server.js"
+    "dev": "node -r dotenv/config dist/server.js",
+    "lol": "bun dist/server.js"
   },
   "author": "Brian Terlson",
   "contributors": [
