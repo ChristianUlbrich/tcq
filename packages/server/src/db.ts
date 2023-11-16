@@ -2,6 +2,7 @@ export const HOST = process.env.DB_URI;
 export const DATABASE_ID = process.env.DB_NAME;
 export const COLLECTION_ID = process.env.DB_CONTAINER;
 export const PARTITION_KEY = process.env.DB_PARTITION_KEY;
+export const PARTITION_VALUE = process.env.DB_PARTITION_VALUE;
 export const SESSION_COLLECTION_ID = process.env.DB_CONTAINER_SESSIONS;
 
 import log from './logger.js';
@@ -51,8 +52,16 @@ async function getMeeting(meetingId: string): Promise<(Meeting & Resource) | und
   const { resource } = await dbClient
     .database(DATABASE_ID!)
     .container(COLLECTION_ID!)
-    .item(meetingId, PARTITION_KEY)
-    .read<Meeting>();
+    .item(meetingId, PARTITION_VALUE)
+    .read<Meeting>()
+    .then(
+      doc => {
+        if (doc.statusCode > 299) {
+          return Promise.reject({ message: 'Meeting not found.', status: doc.statusCode });
+        }
+        return doc;
+      }
+    );
   return resource;
 }
 
