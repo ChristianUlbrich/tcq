@@ -10,6 +10,7 @@ interface Meeting {
   currentTopic: Speaker | undefined;
   agenda: AgendaItem[];
   id: string;
+  partitionKey: string;
   timeboxEnd: Date | string | undefined;
   timeboxSecondsLeft: number | undefined;
   reactions: Reaction[];
