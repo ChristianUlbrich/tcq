@@ -1,33 +1,42 @@
 import Vue from 'vue';
 import template from './NewMeeting.html';
-import { Axios } from 'axios';
-
-const axios = new Axios();
 
 export const NewMeeting = template(
   Vue.extend({
     data() {
       return {
+        user: {
+          ghUsername: '',
+          ghId: 0,
+          name: '',
+          organization: ''
+        },
         chairs: '',
         errorMessage: ''
       };
     },
-    created() {
-      this.chairs = (window as any).user.ghUsername; // populated via router.js
+    created: async function () {
+      this.user = await fetch('/api/user').then((res) => res.ok ? res.json() : Promise.reject(res));
+      this.chairs = this.user.ghUsername;
     },
     methods: {
       async newMeeting() {
         let res;
 
         try {
-          res = await axios.post('/meetings', {
-            chairs: this.chairs
-          });
+          res = await fetch('/meetings', {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({ chairs: this.chairs })
+          })
+            .then(resp => resp.ok ? resp.json() : Promise.reject(resp.json()));
         } catch (e) {
-          this.errorMessage = e.response.data.message;
+          this.errorMessage = e.message;
           return;
         }
-        let { id } = res.data;
+        let { id } = res;
         document.location.href = '/meeting/' + id;
       }
     }

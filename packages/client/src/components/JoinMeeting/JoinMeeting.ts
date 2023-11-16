@@ -1,9 +1,5 @@
 import Vue from 'vue';
 import template from './JoinMeeting.html';
-import { Axios } from 'axios';
-import User from '../../../shared/User';
-
-const axios = new Axios();
 
 export const JoinMeeting = template(
   Vue.extend({
@@ -23,14 +19,12 @@ export const JoinMeeting = template(
           return;
         }
 
-        try {
-          let res = await axios.head('/meeting/' + this.meetingId);
-        } catch (e) {
-          if (e.response && e.response.status === 404) {
-            this.helpText = 'Meeting not found';
-            this.hasError = true;
-            return;
-          }
+        let res = await fetch(`/meeting/${this.meetingId}`);
+
+        if (!res.ok) {
+          this.helpText = 'Meeting not found';
+          this.hasError = true;
+          return;
         }
 
         document.location.href = '/meeting/' + this.meetingId;
