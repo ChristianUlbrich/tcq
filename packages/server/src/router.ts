@@ -61,7 +61,8 @@ router.post('/meetings', async (req, res) => {
     queuedSpeakers: [],
     reactions: [],
     trackTemperature: false,
-    id
+    id,
+    partitionKey: process.env.DB_PARTITION_VALUE ?? 'tc39'
   };
 
   await createMeeting(meeting);
@@ -86,7 +87,9 @@ router.get(
 
 router.get('/logout', function (req, res) {
   req.logout({ keepSessionInfo: false }, (err) => {
-    log.warn('Something went wrong during logout.');
+    if (err) {
+      log.warn('Something went wrong during logout.');
+    }
     if (req.session) {
       req.session.destroy(() => {
         // TODO: Handle errors here?
@@ -139,10 +142,7 @@ router.all('/meeting/:id', (req, res, next) => {
   }
 }, async (req, res, next) => {
   try {
-    const res = await getMeeting(req.params.id);
-    console.debug(' --------------------- ');
-    console.debug(res);
-    console.debug(' --------------------- ');
+    await getMeeting(req.params.id);
     next();
   } catch (error) {
     res.sendStatus(404);
