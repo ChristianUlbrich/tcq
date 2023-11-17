@@ -31,6 +31,8 @@ const session = Session({
   saveUninitialized: true
 });
 
+app.set('query parser', 'simple');
+
 app.use(function requireHTTPS(req, res, next) {
   if (req.get('x-site-deployment-id') && !req.get('x-arr-ssl')) {
     return res.redirect('https://' + req.get('host') + req.url);
