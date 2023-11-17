@@ -3,7 +3,7 @@ import passport from './passport.js';
 import Meeting from '../../shared/dist/Meeting.js';
 import { createMeeting, getMeeting } from './db.js';
 import * as b64 from 'base64-url';
-import User, { fromGHAU, getByUsernames } from './User.js';
+import User, { fromGHAU, getByUsernames, isChair as isChairForMeeting } from './User.js';
 import log from './logger.js';
 
 import { dirname, resolve } from 'node:path';
@@ -103,30 +103,28 @@ router.get('/logout', function (req, res) {
 });
 
 
-router.get('/', (req, res) => {
-  res.sendFile(resolve(__dirname, '../../client/dist/home.html'));
+router.all('/', (req, res) => {
+  if (req.isAuthenticated())
+    res.sendFile(resolve(__dirname, '../../client/dist/new.html'));
+  else
+    res.sendFile(resolve(__dirname, '../../client/dist/home.html'));
 });
 
-router.get('/api/user', (req, res) => {
+router.get('/api/user', async (req, res) => {
   if (req.isAuthenticated()) {
     let user = fromGHAU(req.user);
-    user.isChair = isChair(user.ghid);
+    if (typeof req.query.meetingId === 'string') {
+      user.isChair = isChairForMeeting(user, await getMeeting(req.query.meetingId) as Meeting);
+    } else {
+      user.isChair = isChair(user.ghid);
+    }
     res.json(user);
   } else {
     res.sendStatus(401);
   }
 });
 
-// router.get('/api/chairs', (req, res) => {
-//   if (req.isAuthenticated()) {
-//     let user = fromGHAU(req.user);
-//     res.json(user);
-//   } else {
-//     res.sendStatus(401);
-//   }
-// });
-
-router.all(/^\/new(\.html)?$/, (req, res, next) => {
+router.all(/\/new(\.html)?$/, (req, res, next) => {
   if (req.isAuthenticated()) next();
   else res.redirect('/');
 }, (req, res) => {

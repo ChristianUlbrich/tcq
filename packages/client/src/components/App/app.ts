@@ -100,10 +100,13 @@ let AppComponent = Vue.extend({
     }
   },
   created: async function () {
-    this.user = await fetch('/api/user').then((res) => res.ok ? res.json() : Promise.reject(res));
-    // ToDo set isChair within the user data
-    console.debug(this.user);
-    this.chairs.push(this.user);
+    this.id = document.location.href.match(/meeting\/(.*)/)?.at(1);
+    this.user = await fetch(`/api/user${this.id ? `?meetingId=${this.id}` : ''}`)
+      .then((res) => res.ok ? res.json() : Promise.reject(res))
+      .then((user) => {
+        if (user.isChair) this.chairs.push(user);
+        return user;
+      });
 
     socket.on('state', data => {
       Object.keys(data).forEach(prop => {
