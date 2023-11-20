@@ -17,7 +17,8 @@
   "main": "dist/index.js",
   "scripts": {
     "build": "webpack --mode=production --node-env=production",
-    "build-dev": "webpack --mode=development --node-env=development"
+    "build-dev": "webpack --mode=development --node-env=development",
+    "watch": "webpack --watch --mode=development --node-env=development"
   },
   "engines": {
     "node": "^20.9.0"

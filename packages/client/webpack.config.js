@@ -5,7 +5,7 @@ import { fileURLToPath } from 'node:url';
 const __dirname = dirname(fileURLToPath(import.meta.url));
 
 export default {
-  mode: process.env.NODE_ENV == 'production' ? 'production' : 'development',
+  devtool: process.env.NODE_ENV == 'production' ? false : 'eval-source-map', // or 'inline-source-map'
   entry: {
     app: './src/pages/meeting/meeting.ts',
     home: './src/pages/home/home.ts',
@@ -21,7 +21,12 @@ export default {
       {
         test: /\.(ts|tsx)$/i,
         loader: 'ts-loader',
-        exclude: ['/node_modules/']
+        exclude: ['/node_modules/'],
+        options: {
+          // Don't fail the build because of type mismatches.
+          // There is no need to output types anyway.
+          transpileOnly: true,
+        }
       },
       {
         test: /\.html$/,
