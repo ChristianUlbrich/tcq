@@ -56,6 +56,7 @@ let AppComponent = Vue.extend({
       currentAgendaItem: undefined,
       agenda: [],
       view: 'agenda',
+      socket,
       timeboxEnd: undefined,
       timeboxSecondsLeft: undefined,
       notifyRequestFailure: () => { },
@@ -108,74 +109,74 @@ let AppComponent = Vue.extend({
         return user;
       });
 
-    socket.on('state', data => {
+    this.socket.on('state', data => {
       Object.keys(data).forEach(prop => {
         // this is unfortunate
         (this as any)[prop] = (data as any)[prop];
       });
     });
 
-    socket.on('newQueuedSpeaker', data => {
+    this.socket.on('newQueuedSpeaker', data => {
       this.queuedSpeakers.splice(data.position, 0, data.speaker);
     });
 
-    socket.on('deleteQueuedSpeaker', data => {
+    this.socket.on('deleteQueuedSpeaker', data => {
       let index = this.queuedSpeakers.findIndex(function (queuedSpeaker) {
         return queuedSpeaker.id === data.id;
       });
       this.queuedSpeakers.splice(index, 1);
     });
 
-    socket.on('newCurrentSpeaker', data => {
+    this.socket.on('newCurrentSpeaker', data => {
       this.currentSpeaker = data;
       this.queuedSpeakers.shift();
     });
 
-    socket.on('newReaction', data => {
+    this.socket.on('newReaction', data => {
       console.log("new", data);
       console.log(this.reactions);
       this.reactions.push(data);
     });
 
-    socket.on('deleteReaction', data => {
+    this.socket.on('deleteReaction', data => {
       let index = this.reactions.findIndex((r: Reaction) => {
         return r.reaction == data.reaction && r.user.ghid == data.user.ghid;
       });
       this.reactions.splice(index, 1);
     });
 
-    socket.on('trackTemperature', isTracking => {
+    this.socket.on('trackTemperature', isTracking => {
       if (!isTracking) {
         this.reactions = [];
       }
       this.trackTemperature = isTracking;
     });
 
-    socket.on('newAgendaItem', data => {
+    this.socket.on('newAgendaItem', data => {
       this.agenda.push(data);
     });
 
-    socket.on('newCurrentTopic', data => {
+    this.socket.on('newCurrentTopic', data => {
       this.currentTopic = data;
     });
 
-    socket.on('reorderAgendaItem', data => {
+    this.socket.on('reorderAgendaItem', data => {
       this.agenda.splice(data.newIndex, 0, this.agenda.splice(data.oldIndex, 1)[0]);
     });
 
-    socket.on('deleteAgendaItem', data => {
+    this.socket.on('deleteAgendaItem', data => {
       this.agenda.splice(data.index, 1);
     });
 
-    socket.on('nextAgendaItem', data => {
+    this.socket.on('nextAgendaItem', data => {
       this.currentAgendaItem = data;
     });
 
-    socket.on('reorderQueue', data => {
+    this.socket.on('reorderQueue', data => {
       this.queuedSpeakers.splice(data.newIndex, 0, this.queuedSpeakers.splice(data.oldIndex, 1)[0]);
     });
 
-    socket.on('updateQueuedSpeaker', data => {
+    this.socket.on('updateQueuedSpeaker', data => {
       const speaker = this.queuedSpeakers.find(q => q.id === data.id);
       if (!speaker) return;
       speaker.topic = data.topic;
