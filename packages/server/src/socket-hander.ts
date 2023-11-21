@@ -1,6 +1,7 @@
 import Speaker from '../../shared/dist/Speaker.js';
 import AgendaItem from '../../shared/dist/AgendaItem.js';
-import User, { getByUsername } from './User.js';
+import type User from '../../shared/dist/User.js';
+import { getByUsername } from './User.js';
 import Reaction from '../../shared/dist/Reaction.js';
 import GitHubAuthenticatedUser from '../../shared/dist/GitHubAuthenticatedUser.js';
 import { isChair } from './User.js';

@@ -1,4 +1,4 @@
-import User from '../../shared/dist/User.js';
+import type User from '../../shared/dist/User.js';
 import GitHubAuthenticatedUser from '../../shared/dist/GitHubAuthenticatedUser.js';
 import axios from 'axios';
 import Meeting from '../../shared/dist/Meeting.js';
@@ -60,5 +60,3 @@ export function fromGHAU(user: GitHubAuthenticatedUser): User {
 export function isChair(user: GitHubAuthenticatedUser | User, meeting: Meeting) {
   return meeting.chairs.length === 0 || meeting.chairs.some((c) => c.ghid === user.ghid);
 }
-
-export default User;

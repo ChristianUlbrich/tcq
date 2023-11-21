@@ -33,7 +33,8 @@ await dbClient
   .createIfNotExists({ id: DATABASE_ID, maxThroughput: 1000 });
 await dbClient
   .database(DATABASE_ID)
-  .containers.createIfNotExists({ id: COLLECTION_ID, partitionKey: PARTITION_KEY });
+  .containers
+  .createIfNotExists({ id: COLLECTION_ID, partitionKey: PARTITION_KEY });
 
 async function upsertMeeting(meeting: Meeting) {
   const { resource } = await dbClient

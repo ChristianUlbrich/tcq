@@ -6,6 +6,7 @@ import routes from './router.js';
 import { Server as socketio } from 'socket.io';
 import { Server } from 'http';
 import Session from 'express-session';
+import createMemoryStore from 'memorystore';
 import socketHandler from './socket-hander.js';
 import bodyParser from 'body-parser';
 import bunyan from 'express-bunyan-logger';
@@ -25,11 +26,13 @@ server.listen(port, function () {
   log.info('Application started and listening on port ' + port);
 });
 
+const MemoryStore = createMemoryStore(Session);
 const session = Session({
-  secret: secrets.SESSION_SECRET,
   resave: true,
-  saveUninitialized: true
-});
+  saveUninitialized: true,
+  secret: secrets.SESSION_SECRET,
+  store: new MemoryStore({ checkPeriod: 86400000 })
+}); // prune expired entries every 24h from the store
 
 app.set('query parser', 'simple');
 
