@@ -3,7 +3,8 @@ import passport from './passport.js';
 import Meeting from '../../shared/dist/Meeting.js';
 import { createMeeting, getMeeting } from './db.js';
 import * as b64 from 'base64-url';
-import User, { fromGHAU, getByUsernames, isChair as isChairForMeeting } from './User.js';
+import type User from '../../shared/dist/User.js';
+import { fromGHAU, getByUsernames, isChair as isChairForMeeting } from './User.js';
 import log from './logger.js';
 
 import { dirname, resolve } from 'node:path';

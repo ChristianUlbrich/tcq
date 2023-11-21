@@ -60,5 +60,3 @@ export function fromGHAU(user: GitHubAuthenticatedUser): User {
 export function isChair(user: GitHubAuthenticatedUser | User, meeting: Meeting) {
   return meeting.chairs.length === 0 || meeting.chairs.some((c) => c.ghid === user.ghid);
 }
-
-export default User;
