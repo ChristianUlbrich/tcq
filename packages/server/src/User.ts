@@ -1,4 +1,4 @@
-import User from '../../shared/dist/User.js';
+import type User from '../../shared/dist/User.js';
 import GitHubAuthenticatedUser from '../../shared/dist/GitHubAuthenticatedUser.js';
 import axios from 'axios';
 import Meeting from '../../shared/dist/Meeting.js';

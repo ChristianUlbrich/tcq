@@ -9,8 +9,7 @@
   "main": "dist/server.js",
   "scripts": {
     "build": "tsc",
-    "dev": "node -r dotenv/config dist/server.js dotenv_config_path=../../.env",
-    "lol": "bun --env-file=../../.env dist/server.js"
+    "dev": "node -r dotenv/config dist/server.js dotenv_config_path=../../.env"
   },
   "author": "Brian Terlson",
   "contributors": [
@@ -34,6 +33,7 @@
     "express-bunyan-logger": "1.3.3",
     "express-session": "1.17.3",
     "github": "13.1.1",
+    "memorystore": "1.6.7",
     "passport": "0.6.0",
     "passport-github2": "0.1.12",
     "socket.io": "4.7.2",
