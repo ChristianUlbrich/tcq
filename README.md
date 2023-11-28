@@ -25,6 +25,17 @@ $ npm i
 $ npm run build
 ```
 
+You can copy the `.env.templete` to `.env` and fill out all UPPER_CASE variables.\
+The DB_URI and DB_KEY need be obtained from your CosmosDB.
+
+You need an OAuth App from here: https://github.com/settings/developers.
+
+```
+Application name: something descriptive like, TCQ Development Auth
+Homepage URL: 'https://<AUTHORITY>', like 'http://localhost:3000/'
+Authorization callback URL: is the same as in the .env file
+```
+
 For a local development experience you start the server with:
 
 ```
