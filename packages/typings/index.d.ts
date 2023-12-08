@@ -1,19 +1,22 @@
 declare namespace Payload {
-  type action = "addTopic" | "addAgendaItem" | "updateAgendaItemWeight";
+  type status = number; // see HTTP response status codes
+  type event = "addTopic" | "addAgendaItem" | "updateAgendaItemWeight";
 }
 
 interface Payload {
+  status: Payload.status;
+  event: Payload.event;
   data: unknown;
   toString(): string;
 }
 
 interface PayloadStatics {
-  new(action?: Payload.action): Payload;
-  (action?: Payload.action): Payload;
+  new(event?: Payload.event): Payload;
+  (event?: Payload.event): Payload;
   prototype: Payload;
 }
 
-declare var Payload: PayloadStatics;
+export declare var Payload: PayloadStatics;
 
 // declare class Payload {
 //   constructor(action: Payload.action);
@@ -21,4 +24,11 @@ declare var Payload: PayloadStatics;
 //   toString(action: Payload.action): string;
 // }
 
-export = Payload;
+// export = Payload;
+
+
+export declare class User {
+  constructor();
+
+  toString(): string;
+}
