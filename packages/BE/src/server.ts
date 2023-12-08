@@ -1,24 +1,46 @@
-import WebSocket, { WebSocketServer } from 'ws';
+// https://github.com/websockets/ws/blob/master/doc/ws.md
+// https://github.com/websockets/ws#client-authentication
+import { IncomingMessage } from 'http';
+import { createServer } from 'node:http';
+import { WebSocketServer } from 'ws';
 
-const server = new WebSocketServer({
-  port: 8080,
-  perMessageDeflate: {
-    zlibDeflateOptions: {
-      // See zlib defaults.
-      chunkSize: 1024,
-      memLevel: 7,
-      level: 3
-    },
-    zlibInflateOptions: {
-      chunkSize: 10 * 1024
-    },
-    // Other options settable:
-    clientNoContextTakeover: true, // Defaults to negotiated value.
-    serverNoContextTakeover: true, // Defaults to negotiated value.
-    serverMaxWindowBits: 10, // Defaults to negotiated value.
-    // Below options specified as default values.
-    concurrencyLimit: 10, // Limits zlib concurrency for perf.
-    threshold: 1024 // Size (in bytes) below which messages
-    // should not be compressed if context takeover is disabled.
-  }
+function onSocketError(err) {
+  console.error(err);
+}
+
+const server = createServer();
+const wss = new WebSocketServer({ noServer: true });
+
+wss.on('connection', function connection(ws, request, client) {
+  ws.on('error', console.error);
+
+  ws.on('message', function message(data) {
+    console.log(`Received message ${data} from user ${client}`);
+  });
 });
+
+server.on('upgrade', function upgrade(request, socket, head) {
+  socket.on('error', onSocketError);
+
+  // This function is not defined on purpose. Implement it with your own logic.
+  authenticate(request, function next(err, client) {
+    if (err || !client) {
+      socket.write('HTTP/1.1 401 Unauthorized\r\n\r\n');
+      socket.destroy();
+      return;
+    }
+
+    socket.removeListener('error', onSocketError);
+
+    wss.handleUpgrade(request, socket, head, function done(ws) {
+      wss.emit('connection', ws, request, client);
+    });
+  });
+});
+
+server.listen(8080);
+
+function authenticate(request: IncomingMessage, arg1: (err: any, client: any) => void) {
+  throw new Error('Function not implemented.');
+}
+
