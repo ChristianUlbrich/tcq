@@ -2,11 +2,13 @@
   "editor.defaultFormatter": "biomejs.biome",
   "editor.formatOnSave": true,
   "conventionalCommits.scopes": [
+    "backend",
+    "BE",
     "client",
+    "FE",
     "server",
     "shared",
-    "typings",
-    "backend"
+    "typings"
   ],
   "cSpell.words": [
     "AUTOINCREMENT",
