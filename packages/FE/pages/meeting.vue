@@ -1,0 +1,196 @@
+<script setup lang="ts">
+// import socket from '../../ClientSocket';
+// useClientSocket();
+
+// Vue.mixin({
+//   methods: {
+//     formatUser(user: User) {
+//       let str = '';
+//       if (user.name) {
+//         str += user.name;
+//       } else {
+//         str += '@' + user.ghUsername;
+//       }
+
+//       if (user.organization) {
+//         str += ' (' + user.organization + ')';
+//       }
+
+//       return str;
+//     }
+//   }
+// });
+// interface AdditionalAppState {
+//   user: User;
+//   view: 'agenda' | 'queue';
+//   notifyRequestFailure: Function; // TODO
+//   notifyRequestSuccess: Function;
+//   isChair: boolean;
+// }
+
+// let AppComponent = Vue.extend({
+//   data() {
+//     return {
+//       id: '',
+//       isChair: false,
+//       chairs: [] as User[],
+//       user: {} as User,
+//       currentSpeaker: undefined,
+//       currentTopic: undefined,
+//       queuedSpeakers: [],
+//       reactions: [],
+//       trackTemperature: false,
+//       currentAgendaItem: undefined,
+//       agenda: [],
+//       view: 'agenda',
+//       socket,
+//       timeboxEnd: undefined,
+//       timeboxSecondsLeft: undefined,
+//       notifyRequestFailure: () => { },
+//       notifyRequestSuccess: () => { }
+//     } as Meeting & AdditionalAppState;
+//   },
+//   components: {
+//     Agenda,
+//     QueueControl
+//   },
+//   methods: {
+//     newTopic(message: Message.NewQueuedSpeakerRequest) {
+//       if (!this.socket) return;
+//       this.socket.emit('newQueuedSpeakerRequest', message); // make this {} and you'll get an error on the wrong param?
+//     },
+
+//     nextSpeaker() {
+//       if (!this.socket) return;
+//       // bug!
+//       this.socket.emit('nextSpeaker');
+//     },
+
+//     toggleMenu() {
+//       (this.$refs['menu'] as Element).classList.toggle('is-active');
+//     },
+
+//     showQueue() {
+//       (this.$refs['agenda'] as Vue).$el.setAttribute('style', 'display: none;');
+//       (this.$refs['queue'] as Vue).$el.setAttribute('style', '');
+//     },
+
+//     showAgenda() {
+//       (this.$refs['queue'] as Vue).$el.setAttribute('style', 'display: none;');
+//       (this.$refs['agenda'] as Vue).$el.setAttribute('style', '');
+//     }
+//   },
+//   watch: {
+//     chairs() {
+//       this.isChair = this.chairs.some(u => {
+//         return u.ghid === this.user.ghid;
+//       });
+//     }
+//   },
+//   created: async function () {
+//     this.id = document.location.href.match(/meeting\/(.*)/)?.at(1);
+//     this.user = await fetch(`/api/user${this.id ? `?meetingId=${this.id}` : ''}`)
+//       .then((res) => res.ok ? res.json() : Promise.reject(res))
+//       .then((user) => {
+//         if (user.isChair) this.chairs.push(user);
+//         return user;
+//       });
+
+//     this.socket.on('state', data => {
+//       Object.keys(data).forEach(prop => {
+//         // this is unfortunate
+//         (this as any)[prop] = (data as any)[prop];
+//       });
+//     });
+
+//     this.socket.on('newQueuedSpeaker', data => {
+//       this.queuedSpeakers.splice(data.position, 0, data.speaker);
+//     });
+
+//     this.socket.on('deleteQueuedSpeaker', data => {
+//       let index = this.queuedSpeakers.findIndex(function (queuedSpeaker) {
+//         return queuedSpeaker.id === data.id;
+//       });
+//       this.queuedSpeakers.splice(index, 1);
+//     });
+
+//     this.socket.on('newCurrentSpeaker', data => {
+//       this.currentSpeaker = data;
+//       this.queuedSpeakers.shift();
+//     });
+
+//     this.socket.on('newReaction', data => {
+//       console.log("new", data);
+//       console.log(this.reactions);
+//       this.reactions.push(data);
+//     });
+
+//     this.socket.on('deleteReaction', data => {
+//       let index = this.reactions.findIndex((r: Reaction) => {
+//         return r.reaction == data.reaction && r.user.ghid == data.user.ghid;
+//       });
+//       this.reactions.splice(index, 1);
+//     });
+
+//     this.socket.on('trackTemperature', isTracking => {
+//       if (!isTracking) {
+//         this.reactions = [];
+//       }
+//       this.trackTemperature = isTracking;
+//     });
+
+//     this.socket.on('newAgendaItem', data => {
+//       this.agenda.push(data);
+//     });
+
+//     this.socket.on('newCurrentTopic', data => {
+//       this.currentTopic = data;
+//     });
+
+//     this.socket.on('reorderAgendaItem', data => {
+//       this.agenda.splice(data.newIndex, 0, this.agenda.splice(data.oldIndex, 1)[0]);
+//     });
+
+//     this.socket.on('deleteAgendaItem', data => {
+//       this.agenda.splice(data.index, 1);
+//     });
+
+//     this.socket.on('nextAgendaItem', data => {
+//       this.currentAgendaItem = data;
+//     });
+
+//     this.socket.on('reorderQueue', data => {
+//       this.queuedSpeakers.splice(data.newIndex, 0, this.queuedSpeakers.splice(data.oldIndex, 1)[0]);
+//     });
+
+//     this.socket.on('updateQueuedSpeaker', data => {
+//       const speaker = this.queuedSpeakers.find(q => q.id === data.id);
+//       if (!speaker) return;
+//       speaker.topic = data.topic;
+//       speaker.type = data.type;
+//       speaker.user = data.user;
+//     });
+//   }
+// });
+</script>
+
+<template>
+  <div id="app">
+    <!-- <Agenda ref="agenda" id="agenda" :agenda="agenda" :socket="socket" />
+    <queue-control
+                   ref="queue"
+                   id="queue"
+                   style="display: none"
+                   :currentAgendaItem="currentAgendaItem"
+                   :currentSpeaker="currentSpeaker"
+                   :currentTopic="currentTopic"
+                   :queuedSpeakers="queuedSpeakers"
+                   :reactions="reactions"
+                   :trackTemperature="trackTemperature"
+                   :timeboxEnd="timeboxEnd"
+                   :timeboxSecondsLeft="timeboxSecondsLeft"
+                   :socket="socket"></queue-control> -->
+  </div>
+</template>
+
+<style></style>
