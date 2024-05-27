@@ -29,5 +29,8 @@
   "scripts": {
     "build": "npm run --ws build",
     "dev": "npm run --ws dev"
+  },
+  "devDependencies": {
+    "@biomejs/biome": "1.7.3"
   }
 }
