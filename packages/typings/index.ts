@@ -1,3 +1,4 @@
+//* Utils
 export type Jsonify<T> = T extends { toJSON: (...args: any) => infer R; }
 	? Jsonify<R>
 	: T extends Array<infer I>
@@ -8,15 +9,18 @@ export type Jsonify<T> = T extends { toJSON: (...args: any) => infer R; }
 	? { [K in keyof T]: K extends string | number ? Jsonify<T[K]> : never }
 	: T;
 
-export type Subscription = 'meeting' | 'agenda' | 'topics' | 'polls';
-export type tcqCookie = 'tcqUserId';
+export type GetElementType<T extends any[]> = T extends (infer U)[] ? U : never;
 
+//* Data storage
+export type Collection = 'users' | 'meetings' | 'agendaItems' | 'topics';
 export interface IDBManager {
-	upsert(table: string, data: Record<string, any>): void;
-	read(table: string, conditions: string, params: any[]): any[];
-	delete(table: string, conditions: string, params: any[]): void;
+	upsert(collection: Collection, data: Record<string, any>): void;
+	read(collection: Collection, conditions?: string[], params?: any[]): any[];
+	delete(collection: Collection, conditions: string[], params: any[]): void;
 }
 
+
+//* Data types
 export type User = {
 	id: string;
 	name: string;
@@ -58,6 +62,12 @@ export type Topic = {
 	content: string;
 	weight: number;
 };
+
+//* Web
+export type tcqCookie = 'tcqUserId';
+
+//* Messages and Transport
+export type Subscription = 'meeting' | 'agenda' | 'topics' | 'polls';
 
 type event = 'error'
 	| 'readAgendaItem'

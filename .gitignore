@@ -2,6 +2,7 @@ set-secrets.ps1
 node_modules
 dist
 *.sqlite*
+db.json
 # dotenv environment variable files
 .env
 .env.development

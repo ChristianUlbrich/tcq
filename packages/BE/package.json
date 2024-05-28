@@ -15,12 +15,11 @@
   "devDependencies": {
     "@octokit/auth-oauth-device": "7.1.1",
     "@tc39/typings": "workspace:*",
-    "@types/better-sqlite3": "7.6.10",
     "@types/bun": "latest",
     "@types/node": "20.12.12",
     "@types/ws": "8.5.10",
     "ajv": "8.13.0",
-    "better-sqlite3": "10.0.0",
+    "lowdb": "7.0.1",
     "typescript": "5.4.5",
     "ws": "8.17.0"
   }

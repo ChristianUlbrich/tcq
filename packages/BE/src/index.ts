@@ -1,5 +1,3 @@
-import './managerDb';
-import './server';
 import type { User } from '@tc39/typings';
 
 export type UserInternal = User & {
@@ -12,3 +10,6 @@ export type WebSocketData = {
 };
 
 globalThis.CHAIRS = process.env.CHAIRS?.split(',').map(Number) ?? [];
+
+import './managerDb';
+import './server';
