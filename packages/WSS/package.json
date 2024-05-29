@@ -1,0 +1,27 @@
+{
+  "name": "@tc39/tcq-wsserver",
+  "version": "1.0.0",
+  "main": "dist/server.js",
+  "scripts": {
+    "build": "tsc",
+    "dev": "node -r dotenv/config dist/server.js dotenv_config_path=../../.env"
+  },
+  "license": "Apache-2.0",
+  "engines": {
+    "node": "^20.12.0"
+  },
+  "type": "module",
+  "dependencies": {
+    "@tc39/tcq-shared": "workspace:*",
+    "@tc39/typings": "workspace:*",
+    "lowdb": "7.0.1",
+    "socket.io": "4.7.5",
+    "uuid": "9.0.1"
+  },
+  "devDependencies": {
+    "@types/node": "20.12.12",
+    "@types/uuid": "9.0.8",
+    "dotenv": "16.4.5",
+    "typescript": "5.4.5"
+  }
+}

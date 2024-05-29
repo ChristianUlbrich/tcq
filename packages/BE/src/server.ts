@@ -8,7 +8,7 @@ import { ValidationErrorPayloadInvalid, ValidationErrorPayloadMalformed, validat
 
 const server = serve<WebSocketData>({
 	development: process.env.DEVELOPMENT === 'true',
-	port: process.env.PORT ?? 3000,
+	port: process.env.WSS_PORT ?? 3001,
 	fetch(req, server) {
 		return (
 			authenticate(findCookie('tcqUserId', req.headers.get('Cookie')))
