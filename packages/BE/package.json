@@ -4,7 +4,7 @@
   "description": "",
   "main": "dist/index.js",
   "scripts": {
-    "build": "bun build ./src/index.ts --outdir ./dist",
+    "build": "bun build ./src/index.ts --outdir ./dist --target bun",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "author": "",
@@ -17,10 +17,8 @@
     "@tc39/typings": "workspace:*",
     "@types/bun": "latest",
     "@types/node": "20.12.12",
-    "@types/ws": "8.5.10",
     "ajv": "8.13.0",
     "lowdb": "7.0.1",
-    "typescript": "5.4.5",
-    "ws": "8.17.0"
+    "typescript": "5.4.5"
   }
 }
