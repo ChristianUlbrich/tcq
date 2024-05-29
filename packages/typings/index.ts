@@ -69,67 +69,61 @@ export type tcqCookie = 'tcqUserId';
 //* Messages and Transport
 export type Subscription = 'meeting' | 'agenda' | 'topics' | 'polls';
 
-type event = 'error'
-	| 'readAgendaItem'
-	| 'readMeeting'
-	| 'readTopic'
-	| 'readUser'
-	| 'upsertAgendaItem'
-	| 'upsertMeeting'
-	| 'upsertTopic';
 type withId = { id: string; };
 
 export declare namespace Payload {
 	type error = {
-		// jobId?: string; // message identifier for the client to correlate with its request
-		event: Extract<event, 'error'>;
+		jobId?: string; // message identifier for the client to correlate with its request
+		event: 'error';
 		data: { message: string; };
 	};
 
-	type readAgendaItem = {
-		// jobId?: string; // message identifier for the client to correlate with its request
-		event: Extract<event, 'readAgendaItem'>;
+	type getAgendaItem = {
+		jobId?: string;
+		event: 'getAgendaItem';
 		data: Partial<AgendaItem> & withId;
 	};
-	type readMeeting = {
-		// jobId?: string; // message identifier for the client to correlate with its request
-		event: Extract<event, 'readMeeting'>;
+	type getMeeting = {
+		jobId?: string;
+		event: 'getMeeting';
 		data: Partial<Meeting> & withId;
 	};
-	type readTopic = {
-		// jobId?: string; // message identifier for the client to correlate with its request
-		event: Extract<event, 'readTopic'>;
+	type getTopic = {
+		jobId?: string;
+		event: 'getTopic';
 		data: Partial<Topic> & withId;
 	};
-	type readUser = {
-		// jobId?: string; // message identifier for the client to correlate with its request
-		event: Extract<event, 'readUser'>;
+	type getUser = {
+		jobId?: string;
+		event: 'getUser';
 		data: Partial<User> & withId;
 	};
 
-	type upsertAgendaItem = {
-		// jobId?: string; // message identifier for the client to correlate with its request
-		event: Extract<event, 'upsertAgendaItem'>;
+	type setAgendaItem = {
+		jobId?: string;
+		event: 'setAgendaItem';
 		data: AgendaItem;
 	};
-	type upsertMeeting = {
-		// jobId?: string; // message identifier for the client to correlate with its request
-		event: Extract<event, 'upsertMeeting'>;
+	type setMeeting = {
+		jobId?: string;
+		event: 'setMeeting';
 		data: Meeting;
 	};
-	type upsertTopic = {
-		// jobId?: string; // message identifier for the client to correlate with its request
-		event: Extract<event, 'upsertTopic'>;
+	type setTopic = {
+		jobId?: string;
+		event: 'setTopic';
 		data: Topic;
 	};
+
+	type event = Payload['event'];
 }
 
 export type Payload = Payload.error
-	| Payload.readAgendaItem
-	| Payload.readMeeting
-	| Payload.readTopic
-	| Payload.readUser
-	| Payload.upsertAgendaItem
-	| Payload.upsertMeeting
-	| Payload.upsertTopic;
+	| Payload.getAgendaItem
+	| Payload.getMeeting
+	| Payload.getTopic
+	| Payload.getUser
+	| Payload.setAgendaItem
+	| Payload.setMeeting
+	| Payload.setTopic;
 

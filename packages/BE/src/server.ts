@@ -34,7 +34,7 @@ const server = serve<WebSocketData>({
 			try {
 				const data = JSON.parse(message instanceof Buffer ? message.toString('utf8') : message);
 				if (validate(data)) handlePayload(ws, data);
-				else ws.send(JSON.stringify(ValidationErrorPayloadInvalid));
+				else ws.send(JSON.stringify(ValidationErrorPayloadInvalid(validate.errors ?? [])));
 				validate.errors?.forEach(e => console.error(e));
 			} catch (e) {
 				console.error(e);

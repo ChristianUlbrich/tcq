@@ -8,3 +8,4 @@ export const generateId = () => Math.random().toString(36).slice(2);
 export const merge = (array1: any[], array2: any[]) => [...new Set([...array1, ...array2])];
 
 export const isPayloadError = (value: unknown): value is Payload.error => (value as Payload).event === 'error';
+export const makePayloadError = (message: string): Payload.error => ({ event: 'error', data: { message } });

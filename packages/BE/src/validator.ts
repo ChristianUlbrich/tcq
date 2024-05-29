@@ -1,5 +1,5 @@
 import type { Payload } from '@tc39/typings';
-import Ajv, { type JSONSchemaType } from 'ajv';
+import Ajv, { type JSONSchemaType, type ErrorObject } from 'ajv';
 
 const ajv = new Ajv({ discriminator: true, validateSchema: 'log', strict: 'log' });
 
@@ -11,14 +11,45 @@ const schemaPayload: JSONSchemaType<Payload> = {
 	},
 	required: ['event'],
 	oneOf: [
-		{ properties: { event: { const: 'error' }, data: { type: 'object', properties: { message: { type: 'string' } }, required: ['message'] } } },
-		{ properties: { event: { const: 'readAgendaItem' }, data: { type: 'object', properties: { id: { type: 'string' } }, required: ['id'] } } },
-		{ properties: { event: { const: 'readMeeting' }, data: { type: 'object', properties: { id: { type: 'string' } }, required: ['id'] } } },
-		{ properties: { event: { const: 'readTopic' }, data: { type: 'object', properties: { id: { type: 'string' } }, required: ['id'] } } },
-		{ properties: { event: { const: 'readUser' }, data: { type: 'object', properties: { id: { type: 'string' } }, required: ['id'] } } },
 		{
 			properties: {
-				event: { const: 'upsertAgendaItem' },
+				event: { const: 'error' },
+				jobId: { type: 'string', nullable: true },
+				data: { type: 'object', properties: { message: { type: 'string' } }, required: ['message'] }
+			}
+		},
+		{
+			properties: {
+				event: { const: 'getAgendaItem' },
+				jobId: { type: 'string', nullable: true },
+				data: { type: 'object', properties: { id: { type: 'string' } }, required: ['id'] }
+			}
+		},
+		{
+			properties: {
+				event: { const: 'getMeeting' },
+				jobId: { type: 'string', nullable: true },
+				data: { type: 'object', properties: { id: { type: 'string' } }, required: ['id'] }
+			}
+		},
+		{
+			properties: {
+				event: { const: 'getTopic' },
+				jobId: { type: 'string', nullable: true },
+				data: { type: 'object', properties: { id: { type: 'string' } }, required: ['id'] }
+			}
+		},
+		{
+			properties: {
+				event: { const: 'getUser' },
+				jobId: { type: 'string', nullable: true },
+				data: { type: 'object', properties: { id: { type: 'string' } }, required: ['id'] }
+			}
+		},
+		{
+			properties: {
+				event: { const: 'setAgendaItem' },
+				jobId: { type: 'string', nullable: true },
 				data: {
 					type: 'object',
 					properties: {
@@ -38,7 +69,8 @@ const schemaPayload: JSONSchemaType<Payload> = {
 		},
 		{
 			properties: {
-				event: { const: 'upsertMeeting' },
+				event: { const: 'setMeeting' },
+				jobId: { type: 'string', nullable: true },
 				data: {
 					type: 'object',
 					properties: {
@@ -57,7 +89,8 @@ const schemaPayload: JSONSchemaType<Payload> = {
 		},
 		{
 			properties: {
-				event: { const: 'upsertTopic' },
+				event: { const: 'setTopic' },
+				jobId: { type: 'string', nullable: true },
 				data: {
 					type: 'object',
 					properties: {
@@ -69,7 +102,7 @@ const schemaPayload: JSONSchemaType<Payload> = {
 						content: { type: 'string' },
 						weight: { type: 'integer' },
 					},
-					required: ['id', 'type', 'userName', 'agendaItemId', 'content', 'weight'],
+					required: ['id', 'type', 'userName', 'userGhId', 'agendaItemId', 'content', 'weight'],
 				},
 			}
 		},
@@ -82,10 +115,10 @@ const schemaPayload: JSONSchemaType<Payload> = {
 
 export const validate = ajv.compile(schemaPayload);
 
-export const ValidationErrorPayloadInvalid: Payload.error = {
+export const ValidationErrorPayloadInvalid = (errors: ErrorObject[]): Payload.error => ({
 	event: 'error',
-	data: { message: 'Payload invalid' },
-};
+	data: { message: `Payload invalid: ${errors.map(e => e.message).join(', ')}` },
+});
 
 export const ValidationErrorPayloadMalformed: Payload.error = {
 	event: 'error',
