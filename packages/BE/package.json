@@ -5,6 +5,7 @@
   "main": "dist/index.js",
   "scripts": {
     "build": "bun build ./src/index.ts --outdir ./dist --target bun",
+    "dev": "bun run ./src/index.ts",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "author": "",

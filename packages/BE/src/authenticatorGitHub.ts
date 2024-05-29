@@ -10,7 +10,7 @@ const develAuth = () =>
 		const verification = {
 			device_code: '3584d83530557fdd1f46af8289938c8ef79f9dc5',
 			user_code: 'WDJB-MJHT',
-			verification_uri: 'https://test.localhost:3000/login/device',
+			verification_uri: 'https://you-are-already-logged-in/login/device?tcqUserId=3584d83530557fdd1f46af8289938c8ef79f9dc5',
 			expires_in: 900,
 			interval: 5,
 		};
