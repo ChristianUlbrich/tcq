@@ -110,33 +110,31 @@ export const handlePayload = (ws: ServerWebSocket<WebSocketData>, message: Paylo
 		case 'setAgendaItem': {
 			const notifyMeeting = !message.data.id;
 			const agendaItemResp = setAgendaItem(ws.data.user, message.data);
-			const resp = JSON.stringify(Object.assign({ jobId: message.jobId }, agendaItemResp));
 
-			ws.send(resp);
+			ws.send(JSON.stringify(Object.assign({ jobId: message.jobId }, agendaItemResp)));
 			if (!isPayloadError(agendaItemResp)) {
-				ws.publish('agenda', resp);
-				notifyMeeting && ws.publish('meeting', JSON.stringify({ jobId: message.jobId, event: 'setMeeting', data: readMeetingWithId(message.data.meetingId) }));
+				ws.publish('agenda', JSON.stringify(agendaItemResp));
+				notifyMeeting && ws.publish('meeting', JSON.stringify({ event: 'setMeeting', data: readMeetingWithId(message.data.meetingId) }));
 			}
 			break;
 		}
 		case 'setMeeting': {
 			const meetingResp = setMeeting(ws.data.user, message.data);
-			const resp = JSON.stringify(Object.assign({ jobId: message.jobId }, meetingResp));
-			ws.send(resp);
+
+			ws.send(JSON.stringify(Object.assign({ jobId: message.jobId }, meetingResp)));
 			if (!isPayloadError(meetingResp)) {
-				ws.publish('meeting', resp);
+				ws.publish('meeting', JSON.stringify(meetingResp));
 			}
 			break;
 		}
 		case 'setTopic': {
 			const notifyAgenda = !message.data.id;
 			const topicResp = setTopic(ws.data.user, message.data);
-			const resp = JSON.stringify(Object.assign({ jobId: message.jobId }, topicResp));
 
-			ws.send(resp);
+			ws.send(JSON.stringify(Object.assign({ jobId: message.jobId }, topicResp)));
 			if (!isPayloadError(topicResp)) {
-				ws.publish('topics', resp);
-				notifyAgenda && ws.publish('agenda', JSON.stringify({ jobId: message.jobId, event: 'setAgendaItem', data: readAgendaItemWithId(message.data.agendaItemId) }));
+				ws.publish('topics', JSON.stringify(topicResp));
+				notifyAgenda && ws.publish('agenda', JSON.stringify({ event: 'setAgendaItem', data: readAgendaItemWithId(message.data.agendaItemId) }));
 			}
 			break;
 		}
