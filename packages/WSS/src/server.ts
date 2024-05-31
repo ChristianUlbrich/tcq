@@ -1,4 +1,3 @@
-import type { IncomingMessage } from 'node:http';
 import { Server, type Socket } from 'socket.io';
 import { v4 as uuid } from 'uuid';
 import type AgendaItem from '../../shared/dist/AgendaItem.js';
@@ -6,22 +5,23 @@ import type * as Message from '../../shared/dist/Messages.js';
 import type Reaction from '../../shared/dist/Reaction.js';
 import type Speaker from '../../shared/dist/Speaker.js';
 import type User from '../../shared/dist/User.js';
-import { getByUsername, isChair } from './User.js';
+import { checkTokenValidity, authenticateGitHub, fromGHAU, getByUsername, ghAuthUsers, isChair } from './User.js';
 import { getMeeting, updateMeeting } from './db.js';
-import { createCookie, findCookie } from './handlerCookie.js';
 
 type Responder = (code: number, message?: object) => void;
 
 const io = new Server(Number(process.env.WSS_PORT ?? 3001), {
-	allowRequest: (req, callback) => {
-		const cookie = findCookie('tcqUserId', req.headers.cookie);
-		if (!cookie) {
-			// 	ghAuth();
-			req.session.tcqUserId = 'some-random-device-id';
-		}
-		const isOriginValid = true;
-		callback(null, isOriginValid);
-	}
+	// allowRequest: async (req: EnhancedIncomingMessage, callback) => {
+	// 	console.log('allowRequest', req.url, req.headers.cookie);
+	// 	// const cookie = findCookie('tcqUserId', req.headers.cookie);
+	// 	// if (!cookie) {
+	// 	// 	// 	ghAuth();
+	// 	// 	req.session = { tcqUserId: 'some-random-device-id' };
+	// 	// 	req.headers['Set-Cookie'] = createCookie({ name: 'tcqUserId', value: req.session.tcqUserId, maxAge: 900 });
+	// 	// }
+	// 	const isOriginValid = true;
+	// 	callback(null, isOriginValid);
+	// }
 });
 const PRIORITIES: Speaker['type'][] = ['poo', 'question', 'reply', 'topic'];
 const socks = new Map<string, Set<Socket>>();
@@ -35,7 +35,7 @@ const emitAll = (meetingId: string, type: string, arg?: any) => {
 
 io.engine.on('connection_error', (err) => {
 	console.error(
-		err.req, // the request object
+		//err.req, // the request object
 		err.code, // the error code, for example 1
 		err.message, // the error message, for example "Session ID unknown"
 		err.context // some additional error context
@@ -43,18 +43,44 @@ io.engine.on('connection_error', (err) => {
 });
 
 // called during the handshake
-io.engine.on('initial_headers', (headers, req: IncomingMessage) => {
-	headers['Set-Cookie'] = createCookie({ name: 'tcqUserId', value: req.session.tcqUserId, maxAge: 900 });
-});
+// io.engine.on('initial_headers', (headers, req: EnhancedIncomingMessage) => {
+// 	console.log('initial_headers', req.url, req.headers.cookie, req.session);
+// 	headers['Set-Cookie'] = createCookie({ name: 'tcqUserId', value: 'some-random-device-id', maxAge: 900 });
+// 	// if (req.session?.tcqUserId) headers['Set-Cookie'] = createCookie({ name: 'tcqUserId', value: req.session.tcqUserId, maxAge: 900 });
+// });
 
 // called for each HTTP request (including the WebSocket upgrade)
-io.engine.on('headers', (headers, req: IncomingMessage) => {
-	if (!findCookie('tcqUserId', req.headers.cookie))
-		return;
-	// headers['Set-Cookie'] = createCookie({ name: 'tcqUserId', value: 'user.id' });
-});
+// io.engine.on('headers', (headers, req: EnhancedIncomingMessage) => {
+// 	console.log('headers', req.url, req.headers.cookie);
+// 	if (!findCookie('tcqUserId', req.headers.cookie))
+// 		return;
+// 	console.log('headers', headers);
+// });
+
+// io.use(async (socket, next) => {
+// 	console.log('use', socket.handshake.auth);
+// 	const tcqUserId = socket.handshake.auth.tcqUserId;
+// 	const token = ghUsers.get(tcqUserId)?.accessToken;
+// 	console.log('use', tcqUserId, token);
+// 	socket.emit('use', tcqUserId, token);
+// 	if (token && await checkTokenValidity(token))
+// 		next();
+// 	else
+// 		next(new Error("not authorized"));
+// });
 
 io.on('connection', async (socket) => {
+	// Check auth
+	const tcqUserId = socket.handshake.auth.tcqUserId ?? socket.handshake.headers.tcquserid;
+	const githubUser = ghAuthUsers.get(tcqUserId);
+	if (!githubUser || !await checkTokenValidity(githubUser.accessToken)) {
+		const githubVerification = await authenticateGitHub();
+		socket.emit('state', githubVerification);
+		socket.disconnect(true);
+		return;
+	}
+
+
 	const meetingId = socket.handshake.query.id?.at(0);
 	if (!meetingId) {
 		console.log('disconnecting socket due to bad meeting id');
@@ -70,14 +96,7 @@ io.on('connection', async (socket) => {
 
 	meetingSocks.add(socket);
 
-	const githubUser = socket.handshake.session.passport.user;
-
-	const user: User = {
-		name: githubUser.name,
-		organization: githubUser.organization,
-		ghid: githubUser.ghid,
-		ghUsername: githubUser.ghUsername
-	};
+	const user: User = fromGHAU(githubUser);
 
 	const meeting = await getMeeting(meetingId);
 
@@ -102,6 +121,8 @@ io.on('connection', async (socket) => {
 	socket.on('nextAgendaItemRequest', instrumentSocketFn(nextAgendaItem));
 	socket.on('newReactionRequest', instrumentSocketFn(newReaction));
 	socket.on('trackTemperatureRequest', instrumentSocketFn(trackTemperature));
+	// ToDo - add newMeetingRequest
+	// socket.on('newMeetingRequest', instrumentSocketFn(newMeeting));
 
 	async function nextAgendaItem(respond: Responder, message: Message.NextAgendaItemRequest) {
 		const meeting = await getMeeting(meetingId!);
@@ -240,7 +261,7 @@ io.on('connection', async (socket) => {
 		let owner: User;
 
 		try {
-			owner = await getByUsername(message.ghUsername, githubUser.accessToken);
+			owner = await getByUsername(message.ghUsername, githubUser!.accessToken);
 		} catch (e) {
 			respond(400, { message: 'Github username not found' });
 			return;
