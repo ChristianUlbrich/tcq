@@ -68,7 +68,7 @@ const develAuth = () => new Promise((resolve, reject) => {
 	const verification = {
 		device_code: '3584d83530557fdd1f46af8289938c8ef79f9dc5',
 		user_code: 'WDJB-MJHT',
-		verification_uri: 'https://you-are-already-logged-in/login/device?tcqUserId=3584d83530557fdd1f46af8289938c8ef79f9dc5',
+		verification_uri: 'https://you-are-already-logged-in/login/device',
 		expires_in: 900,
 		interval: 5,
 	};
