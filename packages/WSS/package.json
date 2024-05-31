@@ -3,7 +3,7 @@
   "version": "1.0.0",
   "main": "dist/server.js",
   "scripts": {
-    "build": "tsc",
+    "build": "bun build ./src/server.ts --outdir ./dist --target node",
     "dev": "node -r dotenv/config dist/server.js dotenv_config_path=../../.env"
   },
   "license": "Apache-2.0",
