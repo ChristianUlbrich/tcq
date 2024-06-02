@@ -113,6 +113,7 @@ export const handlePayload = (ws: ServerWebSocket<WebSocketData>, message: Paylo
 
 			ws.send(JSON.stringify(Object.assign({ jobId: message.jobId }, agendaItemResp)));
 			if (!isPayloadError(agendaItemResp)) {
+				//ToDo - publish the whole agenda
 				ws.publish('agenda', JSON.stringify(agendaItemResp));
 				notifyMeeting && ws.publish('meeting', JSON.stringify({ event: 'setMeeting', data: readMeetingWithId(message.data.meetingId) }));
 			}
@@ -133,6 +134,7 @@ export const handlePayload = (ws: ServerWebSocket<WebSocketData>, message: Paylo
 
 			ws.send(JSON.stringify(Object.assign({ jobId: message.jobId }, topicResp)));
 			if (!isPayloadError(topicResp)) {
+				//ToDo - publish the whole queue
 				ws.publish('topics', JSON.stringify(topicResp));
 				notifyAgenda && ws.publish('agenda', JSON.stringify({ event: 'setAgendaItem', data: readAgendaItemWithId(message.data.agendaItemId) }));
 			}

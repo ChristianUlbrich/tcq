@@ -29,6 +29,7 @@ const schemaPayload: JSONSchemaType<Payload> = {
 			properties: {
 				event: { const: 'getMeeting' },
 				jobId: { type: 'string', nullable: true },
+				// get meeting by status 'active' or by id
 				data: { type: 'object', properties: { id: { type: 'string' } }, required: ['id'] }
 			}
 		},
@@ -60,7 +61,7 @@ const schemaPayload: JSONSchemaType<Payload> = {
 						description: { type: 'string' },
 						timebox: { type: 'number' },
 						weight: { type: 'number' },
-						status: { enum: ['frozen', 'locked', 'late', 'continued'] },
+						status: { enum: ['frozen', 'locked', 'late', 'continued', null], nullable: true },
 						queue: { type: 'array', items: { type: 'string' }, nullable: true }
 					},
 					required: ['id', 'name', 'userName', 'meetingId', 'weight'],

@@ -10,15 +10,11 @@ export type Jsonify<T> = T extends { toJSON: (...args: any) => infer R; }
 	: T;
 
 export type GetElementType<T extends any[]> = T extends (infer U)[] ? U : never;
+export type MandateProps<T extends {}, K extends keyof T> = Omit<T, K> & { [MK in K]-?: NonNullable<T[MK]> };
+export type OptionalProps<T, K extends keyof T> = Pick<Partial<T>, K> & Omit<T, K>;
 
 //* Data storage
 export type Collection = 'users' | 'meetings' | 'agendaItems' | 'topics';
-export interface IDBManager {
-	upsert(collection: Collection, data: Record<string, any>): void;
-	read(collection: Collection, conditions?: string[], params?: any[]): any[];
-	delete(collection: Collection, conditions: string[], params: any[]): void;
-}
-
 
 //* Data types
 export type User = {
@@ -48,8 +44,7 @@ export type AgendaItem = {
 	meetingId: string; // Meeting.id
 	description?: string;
 	timebox?: number; // minutes
-	weight: number;
-	status: 'frozen' | 'locked' | 'late' | 'continued';
+	status: 'frozen' | 'locked' | 'late' | 'continued' | null;
 	queue: string[] | null; // Topic.id[]
 };
 
@@ -60,7 +55,6 @@ export type Topic = {
 	userGhId: number;
 	agendaItemId: string;
 	content: string;
-	weight: number;
 };
 
 //* Web
@@ -69,48 +63,56 @@ export type tcqCookie = 'tcqUserId';
 //* Messages and Transport
 export type Subscription = 'meeting' | 'agenda' | 'topics' | 'polls';
 
-type withId = { id: string; };
-
 export declare namespace Payload {
 	type error = {
-		jobId?: string; // message identifier for the client to correlate with its request
+		jobId?: string | null; // message identifier for the client to correlate with its request
 		event: 'error';
 		data: { message: string; };
 	};
 
+	type getAgenda = {
+		jobId?: string | null;
+		event: 'getAgenda';
+		data: MandateProps<Partial<AgendaItem>, 'meetingId'>;
+	};
 	type getAgendaItem = {
-		jobId?: string;
+		jobId?: string | null;
 		event: 'getAgendaItem';
-		data: Partial<AgendaItem> & withId;
+		data: MandateProps<Partial<AgendaItem>, 'id'>;
 	};
 	type getMeeting = {
-		jobId?: string;
+		jobId?: string | null;
 		event: 'getMeeting';
-		data: Partial<Meeting> & withId;
+		data: MandateProps<Partial<Meeting>, 'id'>;
+	};
+	type getQueue = {
+		jobId?: string | null;
+		event: 'getQueue';
+		data: MandateProps<Partial<Topic>, 'agendaItemId'>;
 	};
 	type getTopic = {
-		jobId?: string;
+		jobId?: string | null;
 		event: 'getTopic';
-		data: Partial<Topic> & withId;
+		data: MandateProps<Partial<Topic>, 'id'>;
 	};
 	type getUser = {
-		jobId?: string;
+		jobId?: string | null;
 		event: 'getUser';
-		data: Partial<User> & withId;
+		data: MandateProps<Partial<User>, 'id'>;
 	};
 
 	type setAgendaItem = {
-		jobId?: string;
+		jobId?: string | null;
 		event: 'setAgendaItem';
 		data: AgendaItem;
 	};
 	type setMeeting = {
-		jobId?: string;
+		jobId?: string | null;
 		event: 'setMeeting';
 		data: Meeting;
 	};
 	type setTopic = {
-		jobId?: string;
+		jobId?: string | null;
 		event: 'setTopic';
 		data: Topic;
 	};
