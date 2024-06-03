@@ -20,6 +20,18 @@ const schemaPayload: JSONSchemaType<Payload> = {
 		},
 		{
 			properties: {
+				event: { const: 'getAgenda' },
+				jobId: { type: 'string', nullable: true },
+				data: {
+					oneOf: [
+						{ type: 'array', items: { type: 'object', properties: { meetingId: { type: 'string' } }, required: ['meetingId'] } },
+						{ type: 'object', properties: { meetingId: { type: 'string' } }, required: ['meetingId'] }
+					]
+				}
+			}
+		},
+		{
+			properties: {
 				event: { const: 'getAgendaItem' },
 				jobId: { type: 'string', nullable: true },
 				data: { type: 'object', properties: { id: { type: 'string' } }, required: ['id'] }
@@ -31,6 +43,18 @@ const schemaPayload: JSONSchemaType<Payload> = {
 				jobId: { type: 'string', nullable: true },
 				// get meeting by status 'active' or by id
 				data: { type: 'object', properties: { id: { type: 'string' } }, required: ['id'] }
+			}
+		},
+		{
+			properties: {
+				event: { const: 'getQueue' },
+				jobId: { type: 'string', nullable: true },
+				data: {
+					oneOf: [
+						{ type: 'array', items: { type: 'object', properties: { agendaItemId: { type: 'string' } }, required: ['agendaItemId'] } },
+						{ type: 'object', properties: { agendaItemId: { type: 'string' } }, required: ['agendaItemId'] }
+					]
+				}
 			}
 		},
 		{
