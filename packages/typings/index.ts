@@ -11,7 +11,6 @@ export type Jsonify<T> = T extends { toJSON: (...args: any) => infer R; }
 
 export type GetElementType<T extends any[]> = T extends (infer U)[] ? U : never;
 export type MandateProps<T extends {}, K extends keyof T> = Omit<T, K> & { [MK in K]-?: NonNullable<T[MK]> };
-export type OptionalProps<T, K extends keyof T> = Pick<Partial<T>, K> & Omit<T, K>;
 
 //* Data storage
 export type Collection = 'users' | 'meetings' | 'agendaItems' | 'topics';
@@ -61,7 +60,7 @@ export type Topic = {
 export type tcqCookie = 'tcqUserId';
 
 //* Messages and Transport
-export type Subscription = 'meeting' | 'agenda' | 'topics' | 'polls';
+export type Subscription = 'meeting' | 'agenda' | 'queue' | 'polls';
 
 export declare namespace Payload {
 	type error = {
@@ -73,7 +72,7 @@ export declare namespace Payload {
 	type getAgenda = {
 		jobId?: string | null;
 		event: 'getAgenda';
-		data: MandateProps<Partial<AgendaItem>, 'meetingId'>;
+		data: MandateProps<Partial<AgendaItem>, 'meetingId'> | MandateProps<Partial<AgendaItem>, 'meetingId'>[];
 	};
 	type getAgendaItem = {
 		jobId?: string | null;
@@ -88,7 +87,7 @@ export declare namespace Payload {
 	type getQueue = {
 		jobId?: string | null;
 		event: 'getQueue';
-		data: MandateProps<Partial<Topic>, 'agendaItemId'>;
+		data: MandateProps<Partial<Topic>, 'agendaItemId'> | MandateProps<Partial<Topic>, 'agendaItemId'>[];
 	};
 	type getTopic = {
 		jobId?: string | null;
@@ -116,13 +115,13 @@ export declare namespace Payload {
 		event: 'setTopic';
 		data: Topic;
 	};
-
-	type event = Payload['event'];
 }
 
 export type Payload = Payload.error
+	| Payload.getAgenda
 	| Payload.getAgendaItem
 	| Payload.getMeeting
+	| Payload.getQueue
 	| Payload.getTopic
 	| Payload.getUser
 	| Payload.setAgendaItem
