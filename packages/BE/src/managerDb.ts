@@ -1,6 +1,6 @@
 import { resolve } from 'node:path';
 import type { AgendaItem, Collection, GetElementType, Jsonify, Meeting, Topic } from '@tc39/typings';
-import { JSONFilePreset, JSONFileSyncPreset } from 'lowdb/node';
+import { JSONFilePreset } from 'lowdb/node';
 import type { UserInternal } from '.';
 
 
@@ -25,6 +25,7 @@ export const upsert = <T extends Collection>(collection: T, data: GetElementType
 	if (dat) Object.assign(dat, data);
 	//@ts-expect-error: Ts can't infer the type of the element
 	else DB.data[collection].push(data);
+
 	DB.write().catch(console.error);
 };
 
@@ -41,6 +42,7 @@ export const read = <T extends Collection>(collection: T, conditions?: (keyof Ge
 export const erase = <T extends Collection>(collection: T, conditions: (keyof GetElementType<Data[T]>)[], params: any[]): void => {
 	//@ts-expect-error: Ts can't infer the type of the element
 	DB.data[collection] = DB.data[collection].filter(element => !conditions.every((condition, index) => (element as any)[condition] === params[index]));
+
 	DB.write().catch(console.error);
 };
 

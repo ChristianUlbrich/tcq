@@ -1,147 +1,153 @@
-import type { AgendaItem, Meeting, Payload, Topic } from '@tc39/typings';
+import type { Payload, Topic } from '@tc39/typings';
 import type { ServerWebSocket } from 'bun';
-import type { UserInternal, WebSocketData } from '.';
+import type { WebSocketData } from '.';
 import { readAgendaItemWithId, readChairsWithMeetingId, readMeetingWithId, readTopicWithId, readUserWithId, upsertAgendaItem, upsertMeeting, upsertTopic } from './handlerStorage';
-import { isPayloadError, makePayloadError } from './utils';
+import { isPayloadError, makePayload, makePayloadError } from './utils';
+import { read } from './managerDb';
 
-const getUser = (id: string): Payload.getUser | Payload.error => {
+type WSD = ServerWebSocket<WebSocketData>;
+type Sender = <E extends Payload['event'], P extends Extract<Payload, { event: E; }>, D extends P['data']>(event: E, fn: (data: D) => D, errorMsg?: string) => (ws: WSD, msg: P) => void;
+
+const send: Sender = (event, fn, errorMsg) => (ws, msg) => {
+	let ret: Payload;
 	try {
-		return { event: 'getUser', data: readUserWithId(id) };
+		ret = makePayload(msg.jobId, event, fn(msg.data as any) as any);
 	} catch (e) {
 		console.error(e);
-		return makePayloadError('User not found');
+		ret = makePayloadError(errorMsg ?? (e as Error).message);
 	}
+
+	ws.send(JSON.stringify(ret));
 };
 
-const getMeeting = (id: string): Payload.getMeeting | Payload.error => {
-	try {
-		return { event: 'getMeeting', data: readMeetingWithId(id) };
-	} catch (e) {
-		console.error(e);
-		return makePayloadError('Meeting not found');
-	}
-};
 
-const setMeeting = (userInternal: UserInternal, meeting: Meeting): Payload.setMeeting | Payload.error => {
+const getAgenda = send('getAgenda', (data) => read('agendaItems', ['meetingId'], [Array.isArray(data) ? data.at(0)?.meetingId : data.meetingId]), 'Agenda not found');
+const getQueue = send('getQueue', (data) => read('topics', ['agendaItemId'], [Array.isArray(data) ? data.at(0)?.agendaItemId : data.agendaItemId]), 'Queue not found');
+const getAgendaItem = send('getAgendaItem', ({ id }) => readAgendaItemWithId(id));
+const getMeeting = send('getMeeting', ({ id }) => readMeetingWithId(id));
+const getTopic = send('getTopic', ({ id }) => readTopicWithId(id));
+const getUser = send('getUser', ({ id }) => readUserWithId(id));
+
+
+const setAgendaItem = (ws: WSD, msg: Payload.setAgendaItem) => {
+	const notifyMeeting = !msg.data.id;
+	let agendaItemResp: Payload.setAgendaItem | Payload.error;
 	try {
-		const meetingId = meeting.id;
+		const meetingId = msg.data.meetingId;
 
 		let chairs = CHAIRS;
 		if (meetingId) chairs = readChairsWithMeetingId(meetingId);
-		if (!userInternal.ghId || !chairs.includes(userInternal.ghId)) throw new Error('User is not chair');
+		if (!ws.data.user.ghId || !chairs.includes(ws.data.user.ghId)) throw new Error('User is not chair');
 
-		const newMeeting = upsertMeeting(meeting);
-		return { event: 'setMeeting', data: newMeeting };
+		const newAgendaItem = upsertAgendaItem(msg.data);
+		agendaItemResp = { jobId: msg.jobId, event: 'setAgendaItem', data: newAgendaItem };
 	} catch (e) {
 		console.error(e);
-		return makePayloadError('Meeting upsert failed');
+		agendaItemResp = makePayloadError('Agenda Item upsert failed');
+	}
+
+	ws.send(JSON.stringify(Object.assign({ jobId: msg.jobId }, agendaItemResp)));
+
+	if (!isPayloadError(agendaItemResp)) {
+		const agenda = makePayload(msg.jobId, 'getAgenda', read('agendaItems', ['meetingId'], [msg.data.meetingId]));
+		ws.publish('agenda', JSON.stringify(agenda));
+
+		if (notifyMeeting) {
+			const meeting = makePayload(msg.jobId, 'getMeeting', readMeetingWithId(msg.data.meetingId));
+			ws.publish('meeting', JSON.stringify(meeting));
+		}
 	}
 };
 
-const getAgendaItem = (id: string): Payload.getAgendaItem | Payload.error => {
+const setMeeting = (ws: WSD, msg: Payload.setMeeting) => {
+	let meetingResp: Payload.setMeeting | Payload.error;
 	try {
-		return { event: 'getAgendaItem', data: readAgendaItemWithId(id) };
-	} catch (e) {
-		console.error(e);
-		return makePayloadError('Agenda Item not found');
-	}
-};
-
-const setAgendaItem = (userInternal: UserInternal, agendaItem: AgendaItem): Payload.setAgendaItem | Payload.error => {
-	try {
-		const meetingId = agendaItem.meetingId;
+		const meetingId = msg.data.id;
 
 		let chairs = CHAIRS;
 		if (meetingId) chairs = readChairsWithMeetingId(meetingId);
-		if (!userInternal.ghId || !chairs.includes(userInternal.ghId)) throw new Error('User is not chair');
+		if (!ws.data.user.ghId || !chairs.includes(ws.data.user.ghId)) throw new Error('User is not chair');
 
-		const newAgendaItem = upsertAgendaItem(agendaItem);
-		return { event: 'setAgendaItem', data: newAgendaItem };
+		const newMeeting = upsertMeeting(msg.data);
+		meetingResp = { jobId: msg.jobId, event: 'setMeeting', data: newMeeting };
 	} catch (e) {
 		console.error(e);
-		return makePayloadError('Agenda Item upsert failed');
+		meetingResp = makePayloadError('Meeting upsert failed');
+	}
+
+	ws.send(JSON.stringify(meetingResp));
+	if (!isPayloadError(meetingResp)) {
+		ws.publish('meeting', JSON.stringify(meetingResp));
 	}
 };
 
-const getTopic = (id: string): Payload.getTopic | Payload.error => {
-	try {
-		return { event: 'getTopic', data: readTopicWithId(id) };
-	} catch (e) {
-		console.error(e);
-		return makePayloadError('Topic not found');
-	}
-};
-
-const setTopic = (userInternal: UserInternal, topic: Topic): Payload.setTopic | Payload.error => {
+const setTopic = (ws: WSD, msg: Payload.setTopic) => {
+	const notifyAgenda = !msg.data.id;
+	let topicResp: Payload.setTopic | Payload.error;
 	try {
 		let newTopic: Topic & { id: string; };
-		if (topic.id) {
-			const topicData = readTopicWithId(topic.id);
-			if (userInternal.ghId === topicData.userGhId || (userInternal.ghId && CHAIRS.includes(userInternal.ghId))) {
-				newTopic = upsertTopic(topic);
+		if (msg.data.id) {
+			const topicData = readTopicWithId(msg.data.id);
+			if (ws.data.user.ghId === topicData.userGhId || (ws.data.user.ghId && CHAIRS.includes(ws.data.user.ghId))) {
+				newTopic = upsertTopic(msg.data);
 			} else {
 				throw new Error('User is not allowed to edit this topic');
 			}
 		} else {
-			newTopic = upsertTopic(topic);
+			newTopic = upsertTopic(msg.data);
 		}
 
-		return { event: 'setTopic', data: newTopic };
+		topicResp = { jobId: msg.jobId, event: 'setTopic', data: newTopic };
 	} catch (e) {
 		console.error(e);
-		return makePayloadError('Topic upsert failed');
+		topicResp = makePayloadError('Topic upsert failed');
+	}
+
+	ws.send(JSON.stringify(topicResp));
+
+	if (!isPayloadError(topicResp)) {
+		const queue = makePayload(msg.jobId, 'getQueue', read('topics', ['agendaItemId'], [msg.data.agendaItemId]));
+		ws.publish('queue', JSON.stringify(queue));
+
+		if (notifyAgenda) {
+			const agenda = makePayload(msg.jobId, 'setAgendaItem', readAgendaItemWithId(msg.data.agendaItemId));
+			ws.publish('agenda', JSON.stringify(agenda));
+		}
 	}
 };
 
-export const handlePayload = (ws: ServerWebSocket<WebSocketData>, message: Payload): void => {
+
+export const handlePayload = (ws: WSD, message: Payload): void => {
 	switch (message.event) {
+		case 'getAgenda':
+			getAgenda(ws, message);
+			return;
 		case 'getAgendaItem':
-			ws.send(JSON.stringify(Object.assign({ jobId: message.jobId }, getAgendaItem(message.data.id))));
-			break;
+			getAgendaItem(ws, message);
+			return;
 		case 'getMeeting':
-			ws.send(JSON.stringify(Object.assign({ jobId: message.jobId }, getMeeting(message.data.id))));
-			break;
+			getMeeting(ws, message);
+			return;
+		case 'getQueue':
+			getQueue(ws, message);
+			return;
 		case 'getTopic':
-			ws.send(JSON.stringify(Object.assign({ jobId: message.jobId }, getTopic(message.data.id))));
-			break;
+			getTopic(ws, message);
+			return;
 		case 'getUser':
-			ws.send(JSON.stringify(Object.assign({ jobId: message.jobId }, getUser(message.data.id))));
-			break;
-		case 'setAgendaItem': {
-			const notifyMeeting = !message.data.id;
-			const agendaItemResp = setAgendaItem(ws.data.user, message.data);
-
-			ws.send(JSON.stringify(Object.assign({ jobId: message.jobId }, agendaItemResp)));
-			if (!isPayloadError(agendaItemResp)) {
-				//ToDo - publish the whole agenda
-				ws.publish('agenda', JSON.stringify(agendaItemResp));
-				notifyMeeting && ws.publish('meeting', JSON.stringify({ event: 'setMeeting', data: readMeetingWithId(message.data.meetingId) }));
-			}
-			break;
-		}
-		case 'setMeeting': {
-			const meetingResp = setMeeting(ws.data.user, message.data);
-
-			ws.send(JSON.stringify(Object.assign({ jobId: message.jobId }, meetingResp)));
-			if (!isPayloadError(meetingResp)) {
-				ws.publish('meeting', JSON.stringify(meetingResp));
-			}
-			break;
-		}
-		case 'setTopic': {
-			const notifyAgenda = !message.data.id;
-			const topicResp = setTopic(ws.data.user, message.data);
-
-			ws.send(JSON.stringify(Object.assign({ jobId: message.jobId }, topicResp)));
-			if (!isPayloadError(topicResp)) {
-				//ToDo - publish the whole queue
-				ws.publish('topics', JSON.stringify(topicResp));
-				notifyAgenda && ws.publish('agenda', JSON.stringify({ event: 'setAgendaItem', data: readAgendaItemWithId(message.data.agendaItemId) }));
-			}
-			break;
-		}
+			getUser(ws, message);
+			return;
+		case 'setAgendaItem':
+			setAgendaItem(ws, message);
+			return;
+		case 'setMeeting':
+			setMeeting(ws, message);
+			return;
+		case 'setTopic':
+			setTopic(ws, message);
+			return;
 		default:
 			//* Unreachable, unless the validator is broken or the handler is incomplete
-			ws.send(JSON.stringify(Object.assign({ jobId: message.jobId }, makePayloadError('Unknown event'))));
+			ws.send(JSON.stringify(makePayload(message.jobId, 'error', { message: 'Unknown event' })));
 	}
 };

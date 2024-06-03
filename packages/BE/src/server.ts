@@ -48,14 +48,14 @@ const server = serve<WebSocketData>({
 			// @see type Subscription
 			ws.subscribe('meeting');
 			ws.subscribe('agenda');
-			ws.subscribe('topics');
+			ws.subscribe('queue');
 			ws.subscribe('polls');
 		},
 		close(ws, code, message) {
 			// @see type Subscription
 			ws.unsubscribe('meeting');
 			ws.unsubscribe('agenda');
-			ws.unsubscribe('topics');
+			ws.unsubscribe('queue');
 			ws.unsubscribe('polls');
 		},
 		drain(ws) { }, // the socket is ready to receive more data
