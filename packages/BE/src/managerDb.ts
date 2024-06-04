@@ -48,4 +48,3 @@ export const erase = <T extends Collection>(collection: T, conditions: (keyof Ge
 
 // @example
 // read('users', ['id', 'email'], ['1', 'tim.tester@zalari.de']).at(0)?.ghId;
-

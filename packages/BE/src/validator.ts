@@ -85,7 +85,7 @@ const schemaPayload: JSONSchemaType<Payload> = {
 						description: { type: 'string' },
 						timebox: { type: 'number' },
 						weight: { type: 'number' },
-						status: { enum: ['frozen', 'locked', 'late', 'continued', null], nullable: true },
+						status: { enum: ['frozen', 'locked', 'late', 'continued', null] },
 						queue: { type: 'array', items: { type: 'string' }, nullable: true }
 					},
 					required: ['id', 'name', 'userName', 'meetingId', 'weight'],
