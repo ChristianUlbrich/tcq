@@ -82,7 +82,7 @@ export declare namespace Payload {
 	type getMeeting = {
 		jobId?: string | null;
 		event: 'getMeeting';
-		data: MandateProps<Partial<Meeting>, 'id'>;
+		data: MandateProps<Partial<Meeting>, 'id'> | MandateProps<Partial<Meeting>, 'status'> | MandateProps<Partial<Meeting>, 'status'>[];
 	};
 	type getQueue = {
 		jobId?: string | null;

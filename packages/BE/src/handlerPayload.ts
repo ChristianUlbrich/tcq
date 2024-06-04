@@ -1,9 +1,8 @@
 import type { Payload, Topic } from '@tc39/typings';
 import type { ServerWebSocket } from 'bun';
 import type { WebSocketData } from '.';
-import { readAgendaItemWithId, readChairsWithMeetingId, readMeetingWithId, readTopicWithId, readUserWithId, upsertAgendaItem, upsertMeeting, upsertTopic } from './handlerStorage';
+import { readAgenda, readAgendaItemWithId, readChairsWithMeetingId, readMeeting, readMeetingWithId, readQueue, readTopicWithId, readUserWithId, upsertAgendaItem, upsertMeeting, upsertTopic } from './handlerStorage';
 import { isPayloadError, makePayload, makePayloadError } from './utils';
-import { read } from './managerDb';
 
 type WSD = ServerWebSocket<WebSocketData>;
 type Sender = <E extends Payload['event'], P extends Extract<Payload, { event: E; }>, D extends P['data']>(event: E, fn: (data: D) => D, errorMsg?: string) => (ws: WSD, msg: P) => void;
@@ -21,10 +20,10 @@ const send: Sender = (event, fn, errorMsg) => (ws, msg) => {
 };
 
 
-const getAgenda = send('getAgenda', (data) => read('agendaItems', ['meetingId'], [Array.isArray(data) ? data.at(0)?.meetingId : data.meetingId]), 'Agenda not found');
-const getQueue = send('getQueue', (data) => read('topics', ['agendaItemId'], [Array.isArray(data) ? data.at(0)?.agendaItemId : data.agendaItemId]), 'Queue not found');
+const getAgenda = send('getAgenda', readAgenda, 'Agenda not found');
+const getQueue = send('getQueue', readQueue, 'Queue not found');
 const getAgendaItem = send('getAgendaItem', ({ id }) => readAgendaItemWithId(id));
-const getMeeting = send('getMeeting', ({ id }) => readMeetingWithId(id));
+const getMeeting = send('getMeeting', (data) => readMeeting(data));
 const getTopic = send('getTopic', ({ id }) => readTopicWithId(id));
 const getUser = send('getUser', ({ id }) => readUserWithId(id));
 
@@ -49,7 +48,7 @@ const setAgendaItem = (ws: WSD, msg: Payload.setAgendaItem) => {
 	ws.send(JSON.stringify(Object.assign({ jobId: msg.jobId }, agendaItemResp)));
 
 	if (!isPayloadError(agendaItemResp)) {
-		const agenda = makePayload(msg.jobId, 'getAgenda', read('agendaItems', ['meetingId'], [msg.data.meetingId]));
+		const agenda = makePayload(msg.jobId, 'getAgenda', readAgenda(msg.data));
 		ws.publish('agenda', JSON.stringify(agenda));
 
 		if (notifyMeeting) {
@@ -106,7 +105,7 @@ const setTopic = (ws: WSD, msg: Payload.setTopic) => {
 	ws.send(JSON.stringify(topicResp));
 
 	if (!isPayloadError(topicResp)) {
-		const queue = makePayload(msg.jobId, 'getQueue', read('topics', ['agendaItemId'], [msg.data.agendaItemId]));
+		const queue = makePayload(msg.jobId, 'getQueue', readQueue(msg.data));
 		ws.publish('queue', JSON.stringify(queue));
 
 		if (notifyAgenda) {

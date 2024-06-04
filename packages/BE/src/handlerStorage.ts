@@ -31,8 +31,17 @@ export const readChairsWithMeetingId = (meetingId: string) => {
 
 export const readMeetingWithId = (meetingId: string) => {
 	const meeting = read('meetings', ['id'], [meetingId]).at(0);
-	if (!meeting || !meeting.id) throw new Error('Meeting not found');
+	if (!meeting) throw new Error('Meeting not found');
 	return meeting as MandateProps<Meeting, 'id'>;
+};
+
+export const readMeeting = (meeting: { id: string; } | { id: string; }[] | { status: string; } | { status: string; }[]) => {
+	const M = Array.isArray(meeting) ? meeting[0] : meeting;
+	const m = 'id' in M
+		? read('meetings', ['id'], [M.id]).at(0)
+		: read('meetings', ['status'], [M.status]);
+	if (!m) throw new Error('Meeting not found');
+	return m;
 };
 
 export const upsertMeeting = (meeting: Meeting) => {
@@ -46,7 +55,12 @@ export const upsertMeeting = (meeting: Meeting) => {
 
 	upsert('meetings', meeting);
 
-	return meeting as MandateProps<Meeting, 'id'>;
+	return readMeetingWithId(meeting.id);
+};
+
+export const readAgenda = (agenda: { meetingId: string; } | { meetingId: string; }[]) => {
+	const mId = Array.isArray(agenda) ? agenda.at(0)?.meetingId : agenda.meetingId;
+	return read('agendaItems', ['meetingId'], [mId]);
 };
 
 export const readAgendaItemWithId = (agendaItemId: string) => {
@@ -69,7 +83,12 @@ export const upsertAgendaItem = (agendaItem: AgendaItem) => {
 
 	upsert('agendaItems', agendaItem);
 
-	return agendaItem as MandateProps<AgendaItem, 'id'>;
+	return readAgendaItemWithId(agendaItem.id);
+};
+
+export const readQueue = (topic: { agendaItemId: string; } | { agendaItemId: string; }[]) => {
+	const aId = Array.isArray(topic) ? topic.at(0)?.agendaItemId : topic.agendaItemId;
+	return read('topics', ['agendaItemId'], [aId]);
 };
 
 export const readTopicWithId = (topicId: string) => {
@@ -92,5 +111,5 @@ export const upsertTopic = (topic: Topic) => {
 
 	upsert('topics', topic);
 
-	return topic as MandateProps<Topic, 'id'>;
+	return readTopicWithId(topic.id);
 };

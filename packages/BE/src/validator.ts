@@ -41,8 +41,13 @@ const schemaPayload: JSONSchemaType<Payload> = {
 			properties: {
 				event: { const: 'getMeeting' },
 				jobId: { type: 'string', nullable: true },
-				// get meeting by status 'active' or by id
-				data: { type: 'object', properties: { id: { type: 'string' } }, required: ['id'] }
+				data: {
+					oneOf: [
+						{ type: 'object', properties: { id: { type: 'string' } }, required: ['id'] },
+						{ type: 'object', properties: { status: { enum: ['planned', 'active', 'finished'] } }, required: ['status'] },
+						{ type: 'array', items: { type: 'object', properties: { status: { enum: ['planned', 'active', 'finished'] } }, required: ['status'] } }
+					]
+				}
 			}
 		},
 		{
