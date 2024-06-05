@@ -1,4 +1,5 @@
-<script>
+<script setup lang="ts">
+// useClientSocket();
 </script>
 
 
