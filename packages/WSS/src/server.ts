@@ -83,7 +83,7 @@ io.on('connection', async (socket) => {
 
 	const meetingId = socket.handshake.query.id?.at(0);
 	if (!meetingId) {
-		console.log('disconnecting socket due to bad meeting id');
+		socket.emit('state', { status: 400, message: 'Bad meeting id' });
 		socket.disconnect();
 		return;
 	}
