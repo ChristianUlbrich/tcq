@@ -2,37 +2,39 @@
 //! NEEDED
 import draggable from 'vuedraggable';
 import { request } from '../../ClientSocket';
+import type AgendaItem from '../../shared/dist/AgendaItem';
 
 const props = defineProps<{
   agenda: AgendaItem[];
 }>();
 
 const loading = ref(false);
+const agenda = ref(props.agenda);
 
 async function reorderAgendaItems(e: any) {
   const { newIndex, oldIndex } = e;
-  this.loading = true;
+  loading.value = true;
   try {
     await request('reorderAgendaItemRequest', {
       newIndex,
       oldIndex
     });
   } catch (e) {
-    this.agenda.splice(oldIndex, 0, this.agenda.splice(newIndex, 1)[0]);
+    agenda.value.splice(oldIndex, 0, agenda.value.splice(newIndex, 1)[0]);
   } finally {
-    this.loading = false;
+    loading.value = false;
     (this.$refs['drag-container'] as Vue).$el.classList.remove('dragging');
   }
 }
 
 async function deleteAgendaItem(index: number) {
-  this.loading = true;
+  loading.value = true;
   try {
     await request('deleteAgendaItemRequest', {
       index
     });
   } finally {
-    this.loading = false;
+    loading.value = false;
   }
 }
 
@@ -54,10 +56,10 @@ async function createNewAgendaItem() {
     await request('newAgendaItemRequest', this.newAgendaItem);
     this.cancelForm();
   } catch (e) {
-    this.errorMessage = e.message;
+    this.errorMessage = (e as Error).message;
   } finally {
     (this.$refs['create-button'] as Element).classList.toggle('is-loading');
-    this.loading = false;
+    loading.value = false;
   }
 }
 
