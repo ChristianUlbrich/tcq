@@ -10,8 +10,8 @@
     "build": "tsc"
   },
   "devDependencies": {
-    "socket.io": "4.7.2",
-    "socket.io-client": "4.7.2",
+    "socket.io": "4.7.5",
+    "socket.io-client": "4.7.5",
     "strict-event-emitter-types": "2.0.0",
     "typescript": "5.2.2"
   }

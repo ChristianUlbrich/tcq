@@ -1,122 +1,131 @@
-import * as SocketIOClient from 'socket.io-client';
-import * as SocketIO from 'socket.io';
-import { StrictBroadcast, StrictEventEmitter } from 'strict-event-emitter-types';
-import AgendaItem from './AgendaItem.js';
-import Meeting from './Meeting.js';
-import Reaction, { ReactionTypes } from './Reaction.js';
-import Speaker, { TopicTypes } from './Speaker.js';
-import User from './User.js';
+import type { Socket } from 'socket.io';
+import type { Socket as SocketClient } from 'socket.io-client';
+import type { StrictBroadcast, StrictEventEmitter } from 'strict-event-emitter-types';
+import type AgendaItem from './AgendaItem.js';
+import type Meeting from './Meeting.js';
+import type Reaction from './Reaction.js';
+import type { ReactionTypes } from './Reaction.js';
+import type Speaker from './Speaker.js';
+import type { TopicTypes } from './Speaker.js';
+import type User from './User.js';
 
 interface ServerEvents {
-  newQueuedSpeakerRequest: NewQueuedSpeakerRequest;
-  deleteQueuedSpeakerRequest: DeleteQueuedSpeakerRequest;
-  nextSpeaker: NextSpeakerRequest;
-  nextAgendaItemRequest: NextAgendaItemRequest;
-  newAgendaItemRequest: NewAgendaItemRequest;
-  reorderAgendaItemRequest: ReorderAgendaItemRequest;
-  reorderQueueRequest: ReorderQueueRequest;
-  deleteAgendaItemRequest: DeleteAgendaItemRequest;
-  newReactionRequest: NewReactionRequest;
-  trackTemperatureRequest: TrackTemperatureRequest;
-  userInfo: User;
-  disconnect: void;
+	newQueuedSpeakerRequest: NewQueuedSpeakerRequest;
+	deleteQueuedSpeakerRequest: DeleteQueuedSpeakerRequest;
+	nextSpeaker: NextSpeakerRequest;
+	nextAgendaItemRequest: NextAgendaItemRequest;
+	newAgendaItemRequest: NewAgendaItemRequest;
+	newMeetingRequest: newMeetingRequest;
+	reorderAgendaItemRequest: ReorderAgendaItemRequest;
+	reorderQueueRequest: ReorderQueueRequest;
+	deleteAgendaItemRequest: DeleteAgendaItemRequest;
+	newReactionRequest: NewReactionRequest;
+	trackTemperatureRequest: TrackTemperatureRequest;
+	userInfo: User;
+	disconnect: undefined;
 }
 
 interface ClientEvents {
-  nextAgendaItem: NextAgendaItem;
-  newCurrentSpeaker: NewCurrentSpeaker;
-  newQueuedSpeaker: NewQueuedSpeaker;
-  deleteQueuedSpeaker: DeleteQueuedSpeaker;
-  newAgendaItem: AgendaItem;
-  newCurrentTopic: NewCurrentTopic;
-  reorderAgendaItem: ReorderAgendaItem;
-  reorderQueue: ReorderQueue;
-  deleteAgendaItem: DeleteAgendaItem;
-  newReaction: NewReaction;
-  deleteReaction: DeleteReaction;
-  trackTemperature: TrackTemperature;
-  disconnect: void;
-  state: State;
-  response: Response;
-  updateQueuedSpeaker: UpdateQueuedSpeaker;
+	nextAgendaItem: NextAgendaItem;
+	newCurrentSpeaker: NewCurrentSpeaker;
+	newQueuedSpeaker: NewQueuedSpeaker;
+	deleteQueuedSpeaker: DeleteQueuedSpeaker;
+	newAgendaItem: AgendaItem;
+	newMeeting: Meeting;
+	newCurrentTopic: NewCurrentTopic;
+	reorderAgendaItem: ReorderAgendaItem;
+	reorderQueue: ReorderQueue;
+	deleteAgendaItem: DeleteAgendaItem;
+	newReaction: NewReaction;
+	deleteReaction: DeleteReaction;
+	trackTemperature: TrackTemperature;
+	disconnect: undefined;
+	state: State;
+	response: Response;
+	updateQueuedSpeaker: UpdateQueuedSpeaker;
 }
 
 export interface Response {
-  status: number;
-  message?: string;
+	status: number;
+	message?: string;
 }
 export interface NewQueuedSpeakerRequest {
-  type: TopicTypes;
-  topic: string;
-  id: string;
+	type: TopicTypes;
+	topic: string;
+	id: string;
 }
 
 export interface NewQueuedSpeaker {
-  position: number;
-  speaker: Speaker;
+	position: number;
+	speaker: Speaker;
 }
 
 export interface DeleteQueuedSpeaker {
-  id: string;
+	id: string;
 }
 export interface DeleteQueuedSpeakerRequest {
-  id: string;
+	id: string;
 }
 
 export interface NewAgendaItemRequest {
-  name: string;
-  timebox?: string;
-  ghUsername: string;
+	name: string;
+	timebox?: string;
+	ghUsername: string;
+}
+
+export interface newMeetingRequest {
+	name: string;
+	chairs: string[];
 }
 
 export interface DeleteAgendaItem {
-  index: number;
+	index: number;
 }
 
 export interface DeleteAgendaItemRequest {
-  index: number;
+	index: number;
 }
 
 export interface ReorderAgendaItem {
-  oldIndex: number;
-  newIndex: number;
+	oldIndex: number;
+	newIndex: number;
 }
 
 export interface ReorderQueue {
-  oldIndex: number;
-  newIndex: number;
+	oldIndex: number;
+	newIndex: number;
 }
 
 export interface ReorderQueueRequest {
-  id: string;
-  oldIndex: number;
-  newIndex: number;
+	id: string;
+	oldIndex: number;
+	newIndex: number;
 }
 
 export interface ReorderAgendaItemRequest {
-  oldIndex: number;
-  newIndex: number;
+	oldIndex: number;
+	newIndex: number;
 }
 
 export interface UpdateQueuedSpeaker extends Speaker { }
 export interface State extends Meeting {
-  user: User;
+	user: User;
 }
 
 export interface NextAgendaItemRequest {
-  currentItemId?: string;
+	currentItemId?: string;
 }
 
 export interface NextSpeakerRequest {
-  currentSpeakerId: string;
+	currentSpeakerId: string;
 }
 
 export interface NewReactionRequest {
-  reactionType: ReactionTypes;
+	reactionType: ReactionTypes;
 }
 
 export interface TrackTemperatureRequest {
-  track: boolean;
+	track: boolean;
 }
 
 export interface NextAgendaItem extends AgendaItem { }
@@ -126,6 +135,6 @@ export type NewReaction = Reaction;
 export type DeleteReaction = Reaction;
 export type TrackTemperature = boolean;
 
-export type ServerSocket = StrictEventEmitter<SocketIO.Socket, ServerEvents, ClientEvents>;
-export type ClientSocket = StrictEventEmitter<SocketIOClient.Socket, ClientEvents, ServerEvents>;
+export type ServerSocket = StrictEventEmitter<Socket, ServerEvents, ClientEvents>;
+export type ClientSocket = StrictEventEmitter<SocketClient, ClientEvents, ServerEvents>;
 export type ClientBroadcast = StrictBroadcast<ClientSocket>;
