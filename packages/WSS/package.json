@@ -7,20 +7,14 @@
     "dev": "bun run --env-file=../../.env ./src/server.ts"
   },
   "license": "Apache-2.0",
-  "engines": {
-    "node": "^20.12.0"
-  },
   "type": "module",
-  "dependencies": {
-    "lowdb": "7.0.1",
-    "socket.io": "4.7.5",
-    "uuid": "9.0.1"
-  },
   "devDependencies": {
     "@octokit/auth-oauth-device": "7.1.1",
     "@types/node": "20.12.12",
     "@types/uuid": "9.0.8",
-    "dotenv": "16.4.5",
-    "typescript": "5.4.5"
+    "lowdb": "7.0.1",
+    "socket.io": "4.7.5",
+    "typescript": "5.4.5",
+    "uuid": "9.0.1"
   }
 }
