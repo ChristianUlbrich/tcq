@@ -15,7 +15,7 @@ interface ServerEvents {
 	nextSpeaker: NextSpeakerRequest;
 	nextAgendaItemRequest: NextAgendaItemRequest;
 	newAgendaItemRequest: NewAgendaItemRequest;
-	newMeetingRequest: newMeetingRequest;
+	newMeetingRequest: NewMeetingRequest;
 	reorderAgendaItemRequest: ReorderAgendaItemRequest;
 	reorderQueueRequest: ReorderQueueRequest;
 	deleteAgendaItemRequest: DeleteAgendaItemRequest;
@@ -73,7 +73,7 @@ export interface NewAgendaItemRequest {
 	ghUsername: string;
 }
 
-export interface newMeetingRequest {
+export interface NewMeetingRequest {
 	name: string;
 	chairs: string[];
 }
