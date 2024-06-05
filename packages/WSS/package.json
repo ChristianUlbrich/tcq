@@ -3,7 +3,7 @@
   "version": "1.0.0",
   "main": "dist/server.js",
   "scripts": {
-    "build": "bun build ./src/server.ts --outdir ./dist --target node",
+    "build": "bun build ./src/server.ts --outdir ./dist --target bun",
     "dev": "bun run --env-file=../../.env ./src/server.ts"
   },
   "license": "Apache-2.0",
@@ -12,8 +12,6 @@
   },
   "type": "module",
   "dependencies": {
-    "@tc39/tcq-shared": "workspace:*",
-    "@tc39/typings": "workspace:*",
     "lowdb": "7.0.1",
     "socket.io": "4.7.5",
     "uuid": "9.0.1"
