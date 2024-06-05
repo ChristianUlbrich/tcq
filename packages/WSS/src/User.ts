@@ -161,10 +161,10 @@ const githubAuth = () => new Promise((resolve, reject) => {
 		});
 });
 
-export const authenticateGitHub = process.env.DEVELOPMENT === 'true' ? develAuth : githubAuth;
+export const authenticateGitHub = process.env.NODE_ENV === 'development' ? develAuth : githubAuth;
 
 export const checkTokenValidity = async (token: string): Promise<boolean> => {
-	if (process.env.DEVELOPMENT === 'true') return true;
+	if (process.env.NODE_ENV === 'development') return true;
 	const response = await fetch('https://api.github.com/user', {
 		method: 'HEAD',
 		headers: {

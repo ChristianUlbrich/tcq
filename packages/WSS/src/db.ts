@@ -7,7 +7,7 @@ type Data = { meetings: Meeting[]; };
 const defaultData = {
 	meetings: []
 };
-const db = await JSONFilePreset<Data>(resolve(import.meta.url, '../', 'db.json'), defaultData);
+const db = await JSONFilePreset<Data>(resolve(import.meta.url, 'db.json'), defaultData);
 
 const upsertMeeting = async (meeting: Meeting) => {
 	const index = db.data.meetings.findIndex(m => m.id === meeting.id);
@@ -20,6 +20,5 @@ const upsertMeeting = async (meeting: Meeting) => {
 };
 
 export const getMeeting = async (meetingId: string) => db.data.meetings.find(m => m.id === meetingId);
-export const createMeeting = (meeting: Meeting) => upsertMeeting(meeting);
-export const updateMeeting = (meeting: Meeting) => upsertMeeting(meeting);
-
+export const createMeeting = upsertMeeting;
+export const updateMeeting = upsertMeeting;
