@@ -15,5 +15,8 @@
     "AUTOINCREMENT",
     "sqlite",
     "timebox"
-  ]
+  ],
+  "[dockerfile]": {
+    "editor.defaultFormatter": "ms-azuretools.vscode-docker"
+  }
 }
