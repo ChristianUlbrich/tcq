@@ -16,7 +16,7 @@ const upsertMeeting = async (meeting: Meeting) => {
 	} else {
 		db.data.meetings[index] = meeting;
 	}
-	await db.write();
+	return db.write();
 };
 
 export const getMeeting = async (meetingId: string) => db.data.meetings.find(m => m.id === meetingId);

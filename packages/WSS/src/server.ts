@@ -1,12 +1,13 @@
 import { Server, type Socket } from 'socket.io';
 import { v4 as uuid } from 'uuid';
 import type AgendaItem from '../../shared/dist/AgendaItem.js';
-import type * as Message from '../../shared/dist/Messages.js';
+import type Meeting from '../../shared/dist/Meeting.js';
+import type Message from '../../shared/dist/Messages.js';
 import type Reaction from '../../shared/dist/Reaction.js';
 import type Speaker from '../../shared/dist/Speaker.js';
 import type User from '../../shared/dist/User.js';
-import { checkTokenValidity, authenticateGitHub, fromGHAU, getByUsername, ghAuthUsers, isChair } from './User.js';
-import { getMeeting, updateMeeting } from './db.js';
+import { authenticateGitHub, checkTokenValidity, fromGHAU, getByUsername, getByUsernames, ghAuthUsers, isChair } from './User.js';
+import { createMeeting, getMeeting, updateMeeting } from './db.js';
 
 type Responder = (code: number, message?: object) => void;
 
@@ -121,8 +122,7 @@ io.on('connection', async (socket) => {
 	socket.on('nextAgendaItemRequest', instrumentSocketFn(nextAgendaItem));
 	socket.on('newReactionRequest', instrumentSocketFn(newReaction));
 	socket.on('trackTemperatureRequest', instrumentSocketFn(trackTemperature));
-	// ToDo - add newMeetingRequest
-	// socket.on('newMeetingRequest', instrumentSocketFn(newMeeting));
+	socket.on('newMeetingRequest', instrumentSocketFn(newMeeting));
 
 	async function nextAgendaItem(respond: Responder, message: Message.NextAgendaItemRequest) {
 		const meeting = await getMeeting(meetingId!);
@@ -243,6 +243,41 @@ io.on('connection', async (socket) => {
 			respond(200);
 			emitAll(meetingId!, 'reorderQueue', message);
 		}
+	}
+
+	async function newMeeting(respond: Responder, message: Message.NewMeetingRequest) {
+		const chairs = Array.isArray(message.chairs) ? message.chairs : [message.chairs];
+		// replace leading @ from usernames
+		const usernames = chairs.map(c => c.replace(/^@/, ''));
+
+		let chairUsers: User[] = [];
+		try {
+			chairUsers = await getByUsernames(usernames, githubUser!.accessToken);
+		} catch (e) {
+			respond(400, { message: (e as Error).message });
+			return;
+		}
+
+		//@ts-expect-error
+		const id = btoa(String.fromCodePoint.apply(null, new Uint8Array([Math.floor(Math.random() * 2 ** 8), Math.floor(Math.random() * 2 ** 8), Math.floor(Math.random() * 2 ** 8)])));
+
+		const meeting: Meeting = {
+			chairs: chairUsers,
+			currentAgendaItem: undefined,
+			currentSpeaker: undefined,
+			currentTopic: undefined,
+			timeboxEnd: undefined,
+			timeboxSecondsLeft: undefined,
+			agenda: [],
+			queuedSpeakers: [],
+			reactions: [],
+			trackTemperature: false,
+			id,
+			partitionKey: process.env.DB_PARTITION_VALUE ?? 'tc39'
+		};
+
+		createMeeting(meeting);
+		respond(200, meeting);
 	}
 
 	async function newAgendaItem(respond: Responder, message: Message.NewAgendaItemRequest) {
