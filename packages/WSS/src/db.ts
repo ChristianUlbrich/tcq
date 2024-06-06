@@ -7,15 +7,14 @@ type Data = { meetings: Meeting[]; };
 const defaultData = {
 	meetings: []
 };
-const db = await JSONFilePreset<Data>(resolve(import.meta.url, 'db.json'), defaultData);
+const db = await JSONFilePreset<Data>(resolve(import.meta.dir, './', 'db.json'), defaultData);
 
 const upsertMeeting = async (meeting: Meeting) => {
-	const index = db.data.meetings.findIndex(m => m.id === meeting.id);
-	if (index === -1) {
-		db.data.meetings.push(meeting);
-	} else {
-		db.data.meetings[index] = meeting;
-	}
+	const dat = db.data.meetings.filter(element => element.id === meeting.id).at(0);
+
+	if (dat) Object.assign(dat, meeting);
+	else db.data.meetings.push(meeting);
+
 	return db.write();
 };
 
