@@ -41,7 +41,7 @@ export async function newAgendaItem(socket: Socket, respond: Responder, message:
 	let owner: User;
 
 	try {
-		owner = await getByUsername(message.ghUsername, socket.data.githubUser.accessToken);
+		owner = await getByUsername(message.ghUsername);
 	} catch (e) {
 		respond(400, { message: 'Github username not found' });
 		return;

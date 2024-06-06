@@ -19,32 +19,33 @@ export function addKnownUser(user: User) {
 	knownUsers.set(user.ghUsername, user);
 }
 
-export async function getByUsername(username: string, accessToken: string) {
+export async function getByUsername(username: string) {
 	const known = knownUsers.get(username);
 	if (known) return known;
 
-	const resp = await fetch(`https://api.github.com/users/${username}`, { headers: { Authorization: `token ${accessToken}` } });
+	const resp = await fetch(`https://api.github.com/users/${username}`);
 	if (!resp.ok) {
 		throw new Error(`Couldn't find user '${username}'.`);
 	}
 	const res = await resp.json();
 
 	const user: User = {
-		ghid: res.data.id,
+		ghid: res.id,
 		ghUsername: username,
-		name: res.data.name,
-		organization: res.data.company,
+		name: res.name,
+		organization: res.company,
 	};
 	addKnownUser(user);
 	return user;
 }
 
-export async function getByUsernames(usernames: string[], accessToken: string) {
+export async function getByUsernames(usernames: string[]) {
 	return Promise.all(
 		usernames.map(async (u) => {
 			try {
-				return await getByUsername(u, accessToken);
+				return await getByUsername(u);
 			} catch (e) {
+				console.error(e);
 				throw new Error(`Couldn't find user '${u}'.`);
 			}
 		})

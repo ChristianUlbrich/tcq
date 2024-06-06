@@ -13,7 +13,7 @@ export async function newMeeting(socket: Socket, respond: Responder, message: Me
 
 	let chairUsers: User[] = [];
 	try {
-		chairUsers = await getByUsernames(usernames, socket.data.githubUser.accessToken);
+		chairUsers = await getByUsernames(usernames);
 	} catch (e) {
 		respond(400, { message: (e as Error).message });
 		return;
