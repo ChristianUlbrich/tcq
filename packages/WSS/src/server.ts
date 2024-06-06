@@ -89,14 +89,11 @@ io.on('connection', async (socket) => {
 
 	if (socket.data.meetingId) socket.join(socket.data.meetingId);
 	const respond = (status: number, data: object = {}) => socket.emit('response', { ...data, status });
-	socket.on('newMeetingRequest', (data) => newMeeting(socket, respond, data));
-
-	// after creating a new meeting, you need to reconnect - rn
-	if (!meetingId) return;
 
 	socket.on('deleteAgendaItemRequest', (data) => deleteAgendaItem(socket, respond, data));
 	socket.on('deleteQueuedSpeakerRequest', (data) => deleteQueuedSpeaker(socket, respond, data));
 	socket.on('newAgendaItemRequest', (data) => newAgendaItem(socket, respond, data));
+	socket.on('newMeetingRequest', (data) => newMeeting(socket, respond, data));
 	socket.on('newQueuedSpeakerRequest', (data) => newTopic(socket, respond, data));
 	socket.on('newReactionRequest', (data) => newReaction(socket, respond, data));
 	socket.on('nextAgendaItemRequest', (data) => nextAgendaItem(socket, respond, data));
