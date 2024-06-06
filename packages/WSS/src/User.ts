@@ -82,6 +82,7 @@ const develAuth = () => new Promise((resolve, reject) => {
 	};
 	const user = {
 		id: verification.device_code,
+		login: 'TimTester',
 		name: 'Tim Tester',
 		email: 'tim.tester@zalari.de',
 		ghId: 1337,
@@ -93,15 +94,17 @@ const develAuth = () => new Promise((resolve, reject) => {
 	try {
 		console.debug('Open %s and enter code: %s', verification.verification_uri, verification.user_code);
 		resolve(JSON.stringify({ verification_uri: verification.verification_uri, user_code: verification.user_code, tcqUserId: verification.device_code }));
-		ghAuthUsers.set(verification.device_code, {
+		const ghUser = {
 			id: verification.device_code,
-			ghUsername: user.name,
+			ghUsername: user.login,
 			ghid: user.ghId,
 			name: user.name,
 			organization: user.organization,
 			accessToken: tokenAuthentication.token,
 			refreshToken: tokenAuthentication.token
-		});
+		};
+		ghAuthUsers.set(verification.device_code, ghUser);
+		knownUsers.set(ghUser.ghUsername, fromGHAU(ghUser));
 	} catch (err) {
 		console.error(err, verification);
 		ghAuthUsers.delete(verification.device_code);
@@ -146,7 +149,7 @@ const githubAuth = () => new Promise((resolve, reject) => {
 			// This effectively creates a new user as no valid user was found previously
 			ghAuthUsers.set(V.device_code, {
 				id: V.device_code,
-				ghUsername: user.name,
+				ghUsername: user.login,
 				ghid: user.id,
 				name: user.name,
 				organization: user.company,
