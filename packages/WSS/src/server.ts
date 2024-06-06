@@ -10,29 +10,25 @@ import { authenticateGitHub, checkTokenValidity, fromGHAU, getByUsername, getByU
 import { createMeeting, getMeeting, updateMeeting } from './db.js';
 
 type Responder = (code: number, message?: object) => void;
-
-const io = new Server(Number(process.env.WSS_PORT ?? 3001), {
-	// allowRequest: async (req: EnhancedIncomingMessage, callback) => {
-	// 	console.log('allowRequest', req.url, req.headers.cookie);
-	// 	// const cookie = findCookie('tcqUserId', req.headers.cookie);
-	// 	// if (!cookie) {
-	// 	// 	// 	ghAuth();
-	// 	// 	req.session = { tcqUserId: 'some-random-device-id' };
-	// 	// 	req.headers['Set-Cookie'] = createCookie({ name: 'tcqUserId', value: req.session.tcqUserId, maxAge: 900 });
-	// 	// }
-	// 	const isOriginValid = true;
-	// 	callback(null, isOriginValid);
-	// }
-});
 const PRIORITIES: Speaker['type'][] = ['poo', 'question', 'reply', 'topic'];
-const socks = new Map<string, Set<Socket>>();
+const filterPseudoPrivateProperties = (dat: object) => Object.fromEntries(Object.entries(dat).filter(([key]) => !key.startsWith('_')));
 
-const emitAll = (meetingId: string, type: string, arg?: any) => {
-	const ss = socks.get(meetingId);
-	if (!ss) return;
+const io = new Server(Number(process.env.WSS_PORT ?? 3001));
+// , {
+// 	allowRequest: async (req: EnhancedIncomingMessage, callback) => {
+// 		console.log('allowRequest', req.url, req.headers.cookie);
+// 		// const cookie = findCookie('tcqUserId', req.headers.cookie);
+// 		// if (!cookie) {
+// 		// 	// 	ghAuth();
+// 		// 	req.session = { tcqUserId: 'some-random-device-id' };
+// 		// 	req.headers['Set-Cookie'] = createCookie({ name: 'tcqUserId', value: req.session.tcqUserId, maxAge: 900 });
+// 		// }
+// 		const isOriginValid = true;
+// 		callback(null, isOriginValid);
+// 	}
+// }
 
-	ss.forEach(s => s.emit(type as any, arg));
-};
+const emitAll = (meetingId: string, type: string, arg?: any) => io.to(meetingId).emit(type, arg);
 
 io.engine.on('connection_error', (err) => {
 	console.error(
@@ -81,48 +77,34 @@ io.on('connection', async (socket) => {
 		return;
 	}
 
+	const meetingId = Array.isArray(socket.handshake.query.id) ? socket.handshake.query.id.at(0) : socket.handshake.query.id;
+	if (meetingId) socket.join(meetingId);
 
-	const meetingId = socket.handshake.query.id?.at(0);
-	if (!meetingId) {
-		socket.emit('state', { status: 400, message: 'Bad meeting id' });
-		socket.disconnect();
-		return;
-	}
-
-	let meetingSocks = socks.get(meetingId);
-	if (!meetingSocks) {
-		meetingSocks = new Set();
-		socks.set(meetingId, meetingSocks);
-	}
-
-	meetingSocks.add(socket);
-
+	const meeting = meetingId ? await getMeeting(meetingId) : null;
 	const user: User = fromGHAU(githubUser);
-
-	const meeting = await getMeeting(meetingId);
-
-	const state: Message.State = Object.keys(meeting ?? {})
-		.filter(k => k[0] !== '_')
-		.reduce((s, k) => {
-			(s as any)[k] = (meeting as any)[k];
-			return s;
-		}, {}) as any;
-
-	state.user = user;
-
+	const state: Message.State = {
+		...filterPseudoPrivateProperties(meeting ?? {}) as Meeting,
+		user
+	};
 	socket.emit('state', state);
-	socket.on('newQueuedSpeakerRequest', instrumentSocketFn(newTopic));
-	socket.on('deleteQueuedSpeakerRequest', instrumentSocketFn(deleteQueuedSpeaker));
-	socket.on('nextSpeaker', instrumentSocketFn(nextSpeaker));
-	socket.on('disconnect', disconnect);
-	socket.on('newAgendaItemRequest', instrumentSocketFn(newAgendaItem));
-	socket.on('reorderAgendaItemRequest', instrumentSocketFn(reorderAgendaItem));
-	socket.on('reorderQueueRequest', instrumentSocketFn(reorderQueue));
-	socket.on('deleteAgendaItemRequest', instrumentSocketFn(deleteAgendaItem));
-	socket.on('nextAgendaItemRequest', instrumentSocketFn(nextAgendaItem));
-	socket.on('newReactionRequest', instrumentSocketFn(newReaction));
-	socket.on('trackTemperatureRequest', instrumentSocketFn(trackTemperature));
-	socket.on('newMeetingRequest', instrumentSocketFn(newMeeting));
+
+
+	const respond = (status: number, data: object = {}) => socket.emit('response', { ...data, status });
+	socket.on('newMeetingRequest', (data) => newMeeting(respond, data));
+
+	// after creating a new meeting, you need to reconnect - rn
+	if (!meetingId) return;
+
+	socket.on('deleteAgendaItemRequest', (data) => deleteAgendaItem(respond, data));
+	socket.on('deleteQueuedSpeakerRequest', (data) => deleteQueuedSpeaker(respond, data));
+	socket.on('newAgendaItemRequest', (data) => newAgendaItem(respond, data));
+	socket.on('newQueuedSpeakerRequest', (data) => newTopic(respond, data));
+	socket.on('newReactionRequest', (data) => newReaction(respond, data));
+	socket.on('nextAgendaItemRequest', (data) => nextAgendaItem(respond, data));
+	socket.on('nextSpeaker', (data) => nextSpeaker(respond, data));
+	socket.on('reorderAgendaItemRequest', (data) => reorderAgendaItem(respond, data));
+	socket.on('reorderQueueRequest', (data) => reorderQueue(respond, data));
+	socket.on('trackTemperatureRequest', (data) => trackTemperature(respond, data));
 
 	async function nextAgendaItem(respond: Responder, message: Message.NextAgendaItemRequest) {
 		const meeting = await getMeeting(meetingId!);
@@ -473,29 +455,6 @@ io.on('connection', async (socket) => {
 		emitAll(meetingId!, 'newCurrentSpeaker', meeting.currentSpeaker);
 		if (oldTopic !== meeting.currentTopic) {
 			emitAll(meetingId!, 'newCurrentTopic', meeting.currentTopic);
-		}
-	}
-
-	function instrumentSocketFn(fn: (r: Responder, ...args: any[]) => Promise<any>) {
-		let start: number;
-
-		function respond(status: number, message = { status: -1 } as any) {
-			message.status = status;
-			socket.emit('response', message);
-		}
-
-		return (...args: any[]) => {
-			start = Date.now();
-			fn.call(undefined, respond, ...args);
-		};
-	}
-
-	function disconnect() {
-		if (!meetingSocks) return;
-		meetingSocks.delete(socket);
-
-		if (meetingSocks.size === 0) {
-			socks.delete(meetingId!);
 		}
 	}
 });
