@@ -12,6 +12,12 @@ type ghAuthUser = {
 	email: string;
 };
 
+type TCQVerification = {
+	verificationUri: string;
+	userCode: string;
+	tcqUserId: string;
+};
+
 const knownUsers = new Map<string, User>();
 export const ghAuthUsers = new Map<string, GitHubAuthenticatedUser & { id: string; }>();
 
@@ -65,7 +71,7 @@ export function isChair(user: GitHubAuthenticatedUser | User, meeting: Meeting) 
 	return meeting.chairs.length === 0 || meeting.chairs.some((c) => c.ghid === user.ghid);
 }
 
-const develAuth = () => new Promise((resolve, reject) => {
+const develAuth = () => new Promise<TCQVerification>((resolve, reject) => {
 	const verification = {
 		device_code: '3584d83530557fdd1f46af8289938c8ef79f9dc5',
 		user_code: 'WDJB-MJHT',
@@ -94,7 +100,7 @@ const develAuth = () => new Promise((resolve, reject) => {
 	};
 	try {
 		console.debug('Open %s and enter code: %s', verification.verification_uri, verification.user_code);
-		resolve(JSON.stringify({ verification_uri: verification.verification_uri, user_code: verification.user_code, tcqUserId: verification.device_code }));
+		resolve({ verificationUri: verification.verification_uri, userCode: verification.user_code, tcqUserId: verification.device_code });
 		const ghUser = {
 			id: verification.device_code,
 			ghUsername: user.login,
@@ -113,7 +119,7 @@ const develAuth = () => new Promise((resolve, reject) => {
 	}
 });
 
-const githubAuth = () => new Promise((resolve, reject) => {
+const githubAuth = () => new Promise<TCQVerification>((resolve, reject) => {
 	// `V` is typed as this because `Verification` is not exported from the module
 	let V: { device_code: string; user_code: string; verification_uri: string; expires_in: number; interval: number; };
 
@@ -127,7 +133,7 @@ const githubAuth = () => new Promise((resolve, reject) => {
 			// console.debug(verification);
 			// console.debug('Open %s and enter code: %s', verification.verification_uri, verification.user_code);
 
-			resolve(JSON.stringify({ verification_uri: verification.verification_uri, user_code: verification.user_code, tcqUserId: verification.device_code }));
+			resolve({ verificationUri: verification.verification_uri, userCode: verification.user_code, tcqUserId: verification.device_code });
 		},
 	});
 
@@ -167,7 +173,7 @@ const githubAuth = () => new Promise((resolve, reject) => {
 
 export const authenticateGitHub = process.env.NODE_ENV === 'development' ? develAuth : githubAuth;
 
-export const checkTokenValidity = async (token: string): Promise<boolean> => {
+export const checkTokenValidity = async (token: string) => {
 	if (process.env.NODE_ENV === 'development') return true;
 	const response = await fetch('https://api.github.com/user', {
 		method: 'HEAD',
