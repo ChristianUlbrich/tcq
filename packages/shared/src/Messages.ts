@@ -41,6 +41,7 @@ interface ClientEvents {
 	trackTemperature: TrackTemperature;
 	disconnect: undefined;
 	state: State;
+	auth: TCQVerification;
 	response: Response;
 	updateQueuedSpeaker: UpdateQueuedSpeaker;
 }
@@ -108,6 +109,13 @@ export interface ReorderAgendaItemRequest {
 }
 
 export interface UpdateQueuedSpeaker extends Speaker { }
+
+export type TCQVerification = {
+	verificationUri: string;
+	userCode: string;
+	tcqUserId: string;
+};
+
 export interface State extends Meeting {
 	user: User;
 }
