@@ -67,7 +67,7 @@ io.on('connection', async (socket) => {
 	const githubUser = ghAuthUsers.get(tcqUserId);
 	if (!githubUser || !await checkTokenValidity(githubUser.accessToken)) {
 		const githubVerification = await authenticateGitHub();
-		socket.emit('state', githubVerification);
+		socket.emit('auth', githubVerification);
 		socket.disconnect(true);
 		return;
 	}
