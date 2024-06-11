@@ -45,5 +45,6 @@ export async function newMeeting(socket: Socket, respond: Responder, message: Me
 		if (room !== socket.id) socket.leave(room);
 	});
 	socket.join(id);
-	respond(200, meeting);
+	respond(200);
+	socket.emit('newMeeting', meeting);
 }
