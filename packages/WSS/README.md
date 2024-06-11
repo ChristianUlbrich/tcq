@@ -27,6 +27,8 @@ These are the relevant SocketIO event names:
 | `newReactionRequest` | `respond` and/or `newReaction` or `deleteReaction` |
 | `trackTemperatureRequest` | `respond` or `trackTemperature` |
 
+The types ans shape of the server and client side listeners can be found in the `@tc39/tcq-shared` package under `Messages`.
+
 # Docker Container
 
 Build and start the container with:
