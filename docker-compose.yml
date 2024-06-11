@@ -1,0 +1,7 @@
+services:
+  builder:
+    image: tc39/tcq-builder
+    build:
+      dockerfile: builder.Dockerfile
+    volumes:
+      - ./:/opt/build
