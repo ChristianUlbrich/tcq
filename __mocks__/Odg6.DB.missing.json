@@ -1,0 +1,191 @@
+{
+  resource: undefined,
+  headers: {
+    "transfer-encoding": "chunked",
+    "content-type": "application/json",
+    "content-location": "https://cosmosrgeastusa490a512-345e-495a-9f1bdb-eastus.documents.azure.com/dbs/TCQ/colls/Items/docs/Odg6",
+    "strict-transport-security": "max-age=31536000",
+    date: "Thu, 16 Nov 2023 17:34:24 GMT",
+    server: "Microsoft-HTTPAPI/2.0",
+    "x-ms-activity-id": "04f4cfa5-679e-4f9c-b0b5-b77efacfe0d9",
+    "x-ms-last-state-change-utc": "Sun, 05 Nov 2023 09:45:22.154 GMT",
+    "x-ms-schemaversion": "1.16",
+    lsn: "4",
+    "x-ms-request-charge": "1",
+    "x-ms-documentdb-partitionkeyrangeid": "0",
+    "x-ms-xp-role": "1",
+    "x-ms-global-committed-lsn": "3",
+    "x-ms-number-of-read-regions": "0",
+    "x-ms-transport-request-id": "2",
+    "x-ms-cosmos-llsn": "4",
+    "x-ms-session-token": "0:-1#4",
+    "x-ms-request-duration-ms": "0.309",
+    "x-ms-serviceversion": "version=2.14.0.0",
+    "x-ms-cosmos-physical-partition-id": "0afa8c99-4491-48c6-9909-7a7faa095fac",
+    "x-ms-gatewayversion": "version=2.14.0",
+    "x-ms-throttle-retry-count": 0,
+    "x-ms-throttle-retry-wait-time-ms": 0
+  },
+  statusCode: 404,
+  diagnostics: {
+    clientSideRequestStatistics: {
+      requestStartTimeUTCInMs: 1700156064479,
+      requestDurationInMs: 203,
+      totalRequestPayloadLengthInBytes: 0,
+      totalResponsePayloadLengthInBytes: 4004,
+      locationEndpointsContacted: [
+        "https://cosmosrgeastusa490a512-345e-495a-9f1bdb-eastus.documents.azure.com:443/"
+      ],
+      metadataDiagnostics: [Object ...
+      ],
+      retryDiagnostics: [Object ...
+      ],
+      gatewayStatistics: [
+        [Object ...
+        ]
+      ]
+    },
+    diagnosticNode: undefined,
+    clientConfig: undefined
+  },
+  substatus: undefined,
+  item: {
+    container: {
+      database: [Object ...
+      ],
+      id: "Items",
+      clientContext: [Object ...
+      ],
+      items: [Getter
+      ],
+      scripts: [Getter
+      ],
+      conflicts: [Getter
+      ],
+      url: [Getter
+      ],
+      item: [Function: item
+      ],
+      conflict: [Function: conflict
+      ],
+      read: [Function: read
+      ],
+      readInternal: [Function: readInternal
+      ],
+      replace: [Function: replace
+      ],
+      delete: [Function: delete
+      ],
+      getPartitionKeyDefinition: [Function: getPartitionKeyDefinition
+      ],
+      readPartitionKeyDefinition: [Function: readPartitionKeyDefinition
+      ],
+      readOffer: [Function: readOffer
+      ],
+      getQueryPlan: [Function: getQueryPlan
+      ],
+      readPartitionKeyRanges: [Function: readPartitionKeyRanges
+      ],
+      getFeedRanges: [Function: getFeedRanges
+      ],
+      deleteAllItemsForPartitionKey: [Function: deleteAllItemsForPartitionKey
+      ]
+    },
+    id: "Odg6",
+    clientContext: {
+      cosmosClientOptions: [Object ...
+      ],
+      globalEndpointManager: [Object ...
+      ],
+      clientConfig: [Object ...
+      ],
+      diagnosticLevel: "info",
+      connectionPolicy: [Object ...
+      ],
+      sessionContainer: [Object ...
+      ],
+      partitionKeyDefinitionCache: [Object ...
+      ],
+      pipeline: null,
+      diagnosticFormatter: [Object ...
+      ],
+      diagnosticWriter: [Object ...
+      ],
+      read: [Function: read
+      ],
+      queryFeed: [Function: queryFeed
+      ],
+      getQueryPlan: [Function: getQueryPlan
+      ],
+      queryPartitionKeyRanges: [Function: queryPartitionKeyRanges
+      ],
+      delete: [Function: delete
+      ],
+      patch: [Function: patch
+      ],
+      create: [Function: create
+      ],
+      processQueryFeedResponse: [Function: processQueryFeedResponse
+      ],
+      applySessionToken: [Function: applySessionToken
+      ],
+      replace: [Function: replace
+      ],
+      upsert: [Function: upsert
+      ],
+      execute: [Function: execute
+      ],
+      getDatabaseAccount: [Function: getDatabaseAccount
+      ],
+      getWriteEndpoint: [Function: getWriteEndpoint
+      ],
+      getReadEndpoint: [Function: getReadEndpoint
+      ],
+      getWriteEndpoints: [Function: getWriteEndpoints
+      ],
+      getReadEndpoints: [Function: getReadEndpoints
+      ],
+      batch: [Function: batch
+      ],
+      bulk: [Function: bulk
+      ],
+      captureSessionToken: [Function: captureSessionToken
+      ],
+      clearSessionToken: [Function: clearSessionToken
+      ],
+      recordDiagnostics: [Function: recordDiagnostics
+      ],
+      initializeDiagnosticSettings: [Function: initializeDiagnosticSettings
+      ],
+      getSessionParams: [Function: getSessionParams
+      ],
+      isMasterResource: [Function: isMasterResource
+      ],
+      buildHeaders: [Function: buildHeaders
+      ],
+      getContextDerivedPropsForRequestCreation: [Function: getContextDerivedPropsForRequestCreation
+      ],
+      getClientConfig: [Function: getClientConfig
+      ]
+    },
+    partitionKey: [
+      "/currentAgendaItem"
+    ],
+    url: [Getter
+    ],
+    read: [Function: read
+    ],
+    replace: [Function: replace
+    ],
+    delete: [Function: delete
+    ],
+    patch: [Function: patch
+    ]
+  },
+  requestCharge: [Getter
+  ],
+  activityId: [Getter
+  ],
+  etag: [Getter
+  ]
+}

@@ -1,0 +1,20 @@
+services:
+  tcq:
+    image: tcq:latest
+    init: true
+    user: node
+    build:
+      context: .
+      dockerfile: Dockerfile
+      args:
+        - PORT=3000
+      tags:
+        - tcq:1.0.0
+        - tcq:latest
+    environment:
+      - NODE_ENV=production
+    env_file:
+      - .env
+    ports:
+      - 3000:3000
+    restart: unless-stopped

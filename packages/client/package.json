@@ -1,0 +1,48 @@
+{
+  "name": "@tc39/tcq-client",
+  "version": "1.0.0",
+  "license": "Apache-2.0",
+  "description": "A TC39 Discussion Queue",
+  "author": "Brian Terlson",
+  "contributors": [
+    {
+      "name": "Daniel Rosenwasser",
+      "url": "https://github.com/DanielRosenwasser"
+    }
+  ],
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/bterlson/tcq"
+  },
+  "main": "dist/index.js",
+  "scripts": {
+    "build": "webpack --mode=production --node-env=production",
+    "build-dev": "webpack --mode=development --node-env=development",
+    "watch": "webpack --watch --mode=development --node-env=development"
+  },
+  "engines": {
+    "node": "^20.9.0"
+  },
+  "type": "module",
+  "devDependencies": {
+    "base64-url": "2.3.3",
+    "bulma": "0.9.4",
+    "socket.io-client": "4.7.2",
+    "uuid": "9.0.1",
+    "vue": "2.7.15",
+    "vuedraggable": "2.24.3",
+    "@types/uuid": "9.0.7",
+    "@webpack-cli/generators": "3.0.7",
+    "css-loader": "6.8.1",
+    "html-webpack-plugin": "5.5.3",
+    "sass": "1.69.5",
+    "sass-loader": "13.3.2",
+    "strict-event-emitter-types": "2.0.0",
+    "style-loader": "3.3.3",
+    "ts-loader": "9.5.1",
+    "typescript": "5.2.2",
+    "vue-template-loader": "1.1.0",
+    "webpack": "5.89.0",
+    "webpack-cli": "5.1.4"
+  }
+}
