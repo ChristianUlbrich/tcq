@@ -101,4 +101,5 @@ io.on('connection', async (socket) => {
 	socket.on('reorderAgendaItemRequest', (data) => reorderAgendaItem(socket, respond, data));
 	socket.on('reorderQueueRequest', (data) => reorderQueue(socket, respond, data));
 	socket.on('trackTemperatureRequest', (data) => trackTemperature(socket, respond, data));
+	socket.on('userInfo', () => socket.emit('userInfo', socket.data.user));
 });
