@@ -8,6 +8,25 @@ The client can alternatively send it as a header during the handshake.
 The client MUST listen to the event topic `'auth'` - else you will not get the login information.\
 These include the authentication url and the pass code to enter, as well as the tcqUserId.
 
+# API Description
+
+These are the relevant SocketIO event names:
+
+| Client send events | Server send answer |
+| - | - |
+| connection | `auth` or `state` |
+| `newMeetingRequest` | `respond` and `newMeeting` |
+| `newAgendaItemRequest` | `respond` and/or `newAgendaItem` |
+| `deleteAgendaItemRequest` | `respond` and/or `deleteAgendaItem` |
+| `nextAgendaItemRequest` | `respond` and/or `nextAgendaItem` and `newCurrentSpeaker` |
+| `reorderAgendaItemRequest` | `respond` and/or `reorderAgendaItem` |
+| `newQueuedSpeakerRequest` | `respond` and/or `newQueuedSpeaker` |
+| `deleteQueuedSpeakerRequest` | `respond` and/or `deleteQueuedSpeaker` |
+| `nextSpeaker` | `respond` and/or `nextSpeaker`, `newCurrentTopic` |
+| `reorderQueueRequest` | `respond` and/or `updateQueuedSpeaker` or `reorderQueue` |
+| `newReactionRequest` | `respond` and/or `newReaction` or `deleteReaction` |
+| `trackTemperatureRequest` | `respond` or `trackTemperature` |
+
 # Docker Container
 
 Build and start the container with:
