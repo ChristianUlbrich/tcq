@@ -15,3 +15,12 @@ services:
     command: node dist/server/server.js
     ports:
       - 3000:3000
+
+  prod:
+    image: tc39/tcq-reloaded
+    build:
+      dockerfile: service.Dockerfile
+    env_file:
+      - .env-production
+    ports:
+      - 3000:3000
