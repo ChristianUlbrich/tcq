@@ -1,41 +1,39 @@
-export const HOST = 'https://tcq.documents.azure.com:443/';
-export const DATABASE_ID = 'tcq';
-export const COLLECTION_ID = 'items';
-export const SESSION_COLLECTION_ID = 'sessions';
+const DB_ADAPTER = process.env['TCQ_DB_ADAPTER'] || 'cosmos-db';
 
-import { CDB_SECRET } from './secrets';
-import * as docdb from 'documentdb-typescript';
-import Speaker from '../shared/Speaker';
 import Meeting from '../shared/Meeting';
-import { DocumentResource } from 'documentdb-typescript/typings/_DocumentDB';
-
-const meetingsCollection = getMeetingsCollection();
 
 export async function updateMeeting(meeting: Meeting) {
-  let collection = await meetingsCollection;
-  await collection.storeDocumentAsync(meeting, docdb.StoreMode.UpdateOnly);
+  // any other adapters must come above this, we do this to allow "easy" zero config locally...
+  // and because for historic reasons we default to cosmos-db
+  if (DB_ADAPTER === 'simple-memory-db' || process.env['NODE_ENV'] !== 'production') {
+    const { updateMeeting } = await import('./adapters/db/simple-memory-db.db.adapter');
+    return updateMeeting(meeting);
+  } else if (DB_ADAPTER === 'cosmos-db') {
+    const {updateMeeting} = await import('./adapters/db/cosmos-db.db.adapter');
+    return updateMeeting(meeting);
+  }
 }
 
 export async function getMeeting(meetingId: string) {
-  let collection = await meetingsCollection;
-
-  return (await collection.findDocumentAsync(meetingId)) as Meeting & DocumentResource;
+  // any other adapters must come above this, we do this to allow "easy" zero config locally...
+  // and because for historic reasons we default to cosmos-db
+  if (DB_ADAPTER === 'simple-memory-db' || process.env['NODE_ENV'] !== 'production') {
+    const { getMeeting } = await import('./adapters/db/simple-memory-db.db.adapter');
+    return getMeeting(meetingId);
+  } else if (DB_ADAPTER === 'cosmos-db') {
+    const {getMeeting} = await import('./adapters/db/cosmos-db.db.adapter');
+    return getMeeting(meetingId);
+  }
 }
 
 export async function createMeeting(meeting: Meeting) {
-  let collection = await meetingsCollection;
-
-  return collection.storeDocumentAsync(meeting);
-}
-
-export async function getMeetingsCollection() {
-  return new docdb.Collection(COLLECTION_ID, DATABASE_ID, HOST, CDB_SECRET).openAsync();
-}
-
-const reUUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
-function validUUID(seen: Set<string>, uuid: string) {
-  if (seen.has(uuid)) return false;
-  if (!reUUID.exec(uuid)) return false;
-
-  return true;
+  // any other adapters must come above this, we do this to allow "easy" zero config locally...
+  // and because for historic reasons we default to cosmos-db
+  if (DB_ADAPTER === 'simple-memory-db' || process.env['NODE_ENV'] !== 'production') {
+    const { createMeeting } = await import('./adapters/db/simple-memory-db.db.adapter');
+    return createMeeting(meeting);
+  } else if (DB_ADAPTER === 'cosmos-db') {
+    const {createMeeting} = await import('./adapters/db/cosmos-db.db.adapter');
+    return createMeeting(meeting);
+  }
 }

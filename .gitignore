@@ -4,3 +4,8 @@ dist
 
 #ide
 .idea
+
+#envs
+.env-development
+.env-production
+

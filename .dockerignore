@@ -1,5 +1,5 @@
 *
 #currently we build manually...
-#!src
-#!package.json
-#!package-lock.json
+!src
+!package.json
+!package-lock.json

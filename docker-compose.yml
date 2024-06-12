@@ -5,13 +5,13 @@ services:
       dockerfile: builder.Dockerfile
     volumes:
       - ./:/opt/build
-
   dev:
     image: node:10.19-slim
     volumes:
       - ./dist:/dist
       - ./node_modules:/node_modules
-
+    env_file:
+      - .env-development
     command: node dist/server/server.js
     ports:
       - 3000:3000

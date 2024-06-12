@@ -9,8 +9,6 @@ import * as socketio from 'socket.io';
 import { Server } from 'http';
 import * as Session from 'express-session';
 import socketHandler from './socket-hander';
-import DocumentDBSession = require('documentdb-session');
-import * as dbConstants from './db';
 import * as bodyParser from 'body-parser';
 
 const app = express();
@@ -22,18 +20,23 @@ server.listen(port, function () {
   log.info('Application started and listening on port ' + port);
 });
 
-const DocumentDBStore = DocumentDBSession(Session);
-
-const sessionStore = new DocumentDBStore({
-  host: dbConstants.HOST,
-  database: dbConstants.DATABASE_ID,
-  collection: dbConstants.SESSION_COLLECTION_ID,
-  key: secrets.CDB_SECRET
-});
+function getSessionStoreForSession(session: any) {
+  if (process.env['TCQ_SESSION_STORE_ADAPTER'] === 'cosmos-db') {
+    const { createSessionStoreForSession } = require('./adapters/session-store/cosmos-db.session-store.adapter');
+    return {
+      store: createSessionStoreForSession(session)
+    }
+  } else {
+    return {
+      // if no sessionStore adapter is provided, return an empty object, because this
+      // will later on default to the built-in memory store
+    }
+  }
+}
 
 const session = Session({
   secret: secrets.SESSION_SECRET,
-  store: sessionStore,
+  ...{...getSessionStoreForSession(Session)},
   resave: true,
   saveUninitialized: true
 });
