@@ -21,22 +21,26 @@ server.listen(port, function () {
 });
 
 function getSessionStoreForSession(session: any) {
-  if (process.env['TCQ_SESSION_STORE_ADAPTER'] === 'cosmos-db') {
-    const { createSessionStoreForSession } = require('./adapters/session-store/cosmos-db.session-store.adapter');
-    return {
-      store: createSessionStoreForSession(session)
-    }
-  } else {
+  // TODO: use nullish coalescing if available
+  const SESSION_STORE_ADAPTER = process.env['TCQ_SESSION_STORE_ADAPTER'] ||
+  // due to historical reasons we default to cosmos-db on prod
+  process.env['NODE_ENV'] === 'production' ? 'cosmos-db' : 'none';
+  if (SESSION_STORE_ADAPTER === 'none') {
     return {
       // if no sessionStore adapter is provided, return an empty object, because this
       // will later on default to the built-in memory store
+    }
+  } else {
+    const { createSessionStoreForSession } = require(`./adapters/session-store/${SESSION_STORE_ADAPTER}.session-store.adapter`);
+    return {
+      store: createSessionStoreForSession(session)
     }
   }
 }
 
 const session = Session({
   secret: secrets.SESSION_SECRET,
-  ...{...getSessionStoreForSession(Session)},
+  ...getSessionStoreForSession(Session),
   resave: true,
   saveUninitialized: true
 });
