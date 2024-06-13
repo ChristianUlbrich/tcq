@@ -1,3 +1,11 @@
 set-secrets.ps1
 node_modules
 dist
+
+#ide
+.idea
+
+#envs
+.env-development
+.env-production
+

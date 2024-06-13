@@ -7,7 +7,7 @@ import GitHubAuthenticatedUser from '../shared/GitHubAuthenticatedUser';
 import * as socketio from 'socket.io';
 import { isChair } from './User';
 import * as Message from '../shared/Messages';
-import { updateMeeting, getMeeting, getMeetingsCollection } from './db';
+import { updateMeeting, getMeeting } from './db';
 import { TopicTypes } from '../shared/Speaker';
 import gha from './ghapi';
 const PRIORITIES: Speaker['type'][] = ['poo', 'question', 'reply', 'topic'];
@@ -50,7 +50,7 @@ export default async function connection(socket: Message.ServerSocket) {
     ghUsername: githubUser.ghUsername
   };
 
-  const meeting = await getMeeting(meetingId);
+  const meeting = await getMeeting(meetingId) as Meeting;
 
   let state: Message.State = Object.keys(meeting)
     .filter(k => k[0] !== '_')
@@ -75,7 +75,7 @@ export default async function connection(socket: Message.ServerSocket) {
   socket.on('trackTemperatureRequest', instrumentSocketFn(trackTemperature));
 
   async function nextAgendaItem(respond: Responder, message: Message.NextAgendaItemRequest) {
-    const meeting = await getMeeting(meetingId);
+    const meeting = await getMeeting(meetingId) as Meeting;
 
     if (meeting.currentAgendaItem && meeting.currentAgendaItem.id !== message.currentItemId) {
       respond(403, { message: 'Agenda item out of sync' });
@@ -105,7 +105,7 @@ export default async function connection(socket: Message.ServerSocket) {
   }
 
   async function deleteAgendaItem(respond: Responder, message: Message.DeleteAgendaItem) {
-    const meeting = await getMeeting(meetingId);
+    const meeting = await getMeeting(meetingId) as Meeting;
     if (!isChair(user, meeting)) {
       respond(403);
       return;
@@ -118,7 +118,7 @@ export default async function connection(socket: Message.ServerSocket) {
   }
 
   async function reorderAgendaItem(respond: Responder, message: Message.ReorderAgendaItemRequest) {
-    const meeting = await getMeeting(meetingId);
+    const meeting = await getMeeting(meetingId) as Meeting;
     if (!isChair(user, meeting)) {
       respond(403);
       return;
@@ -131,7 +131,7 @@ export default async function connection(socket: Message.ServerSocket) {
   }
 
   async function reorderQueue(respond: Responder, message: Message.ReorderQueueRequest) {
-    const meeting = await getMeeting(meetingId);
+    const meeting = await getMeeting(meetingId) as Meeting;
     if (!isChair(user, meeting)) {
       respond(403);
       return;
@@ -177,7 +177,7 @@ export default async function connection(socket: Message.ServerSocket) {
   }
 
   async function newAgendaItem(respond: Responder, message: Message.NewAgendaItemRequest) {
-    const meeting = await getMeeting(meetingId);
+    const meeting = await getMeeting(meetingId) as Meeting;
     if (!isChair(user, meeting)) {
       respond(403);
       return;
@@ -212,7 +212,7 @@ export default async function connection(socket: Message.ServerSocket) {
       ...message
     };
 
-    const meeting = await getMeeting(meetingId);
+    const meeting = await getMeeting(meetingId) as Meeting;
 
     const { currentSpeaker, queuedSpeakers } = meeting;
 
@@ -240,7 +240,7 @@ export default async function connection(socket: Message.ServerSocket) {
       reaction: message.reactionType
     };
 
-    const meeting = await getMeeting(meetingId);
+    const meeting = await getMeeting(meetingId) as Meeting;
     if (!meeting.reactions) {
       meeting.reactions = [];
     }
@@ -264,7 +264,7 @@ export default async function connection(socket: Message.ServerSocket) {
   }
 
   async function trackTemperature(respond: Responder, message: Message.TrackTemperatureRequest) {
-    const meeting = await getMeeting(meetingId);
+    const meeting = await getMeeting(meetingId) as Meeting;
     if (!message.track) {
       meeting.reactions = [];
       await updateMeeting(meeting);
@@ -277,7 +277,7 @@ export default async function connection(socket: Message.ServerSocket) {
     respond: Responder,
     message: Message.DeleteQueuedSpeakerRequest
   ) {
-    const meeting = await getMeeting(meetingId);
+    const meeting = await getMeeting(meetingId) as Meeting;
 
     const { queuedSpeakers } = meeting;
 
@@ -304,7 +304,7 @@ export default async function connection(socket: Message.ServerSocket) {
   }
 
   async function nextSpeaker(respond: Responder, message: Message.NextSpeakerRequest) {
-    const meeting = await getMeeting(meetingId);
+    const meeting = await getMeeting(meetingId) as Meeting;
     if (
       user.ghid &&
       meeting.currentSpeaker &&

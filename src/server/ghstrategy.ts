@@ -4,8 +4,9 @@ import GHAuthUser from '../shared/GitHubAuthenticatedUser';
 import { addKnownUser, fromGHAU } from './User';
 const callbackURL =
   process.env.NODE_ENV === 'production'
-    ? 'http://tcq.app/auth/github/callback'
-    : 'http://127.0.0.1:3000/auth/github/callback';
+    // TODO: use nullish coalescing if available
+    ? process.env['TCQ_GH_CALLBACK_URL'] || 'http://tcq.app/auth/github/callback'
+    : 'http://localhost:3000/auth/github/callback';
 
 export default new GitHubStrategy(
   {

@@ -1,0 +1,6 @@
+*
+#currently we build manually...
+!src
+!scripts
+!package.json
+!package-lock.json
