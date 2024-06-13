@@ -11,13 +11,14 @@
     "build-frontend": "webpack --config ./src/client/webpack.dev.js",
     "build-frontend-watch": "webpack --watch --config ./src/client/webpack.dev.js",
     "build-backend": "tsc -p ./src/server",
+    "postbuild-backend": "cp -f ./src/server/adapters/db/mongodb.db.adapter.js dist/server/adapters/db/mongodb.db.adapter.js",
     "build-production": "npm run build-backend && webpack -p --config ./src/client/webpack.prod.js",
     "iterate": "npm run build-backend && concurrently \"npm run build-frontend-watch\" \"node ./dist/server/server.js\"",
     "start": "node dist/server/server.js | \"./node_modules/.bin/bunyan\"",
     "docker:build:backend": "docker run --rm -v .:/opt/build tc39/tcq-builder npm run build-backend",
     "docker:build:frontend": "docker run --rm -v .:/opt/build tc39/tcq-builder npm run build-frontend",
     "docker:build:production": "docker run --rm -v .:/opt/build tc39/tcq-builder npm run build-production",
-    "postinstall": "node scripts/patch-whatwg-url.js"
+    "postinstall": "node scripts/patch-whatwg-url.js && rm -rf node_modules/@types/whatwg-url/ && rm -rf node_modules/@types/webidl-conversions/"
   },
   "author": "Brian Terlson",
   "contributors": [
@@ -45,6 +46,7 @@
     "express-bunyan-logger": "1.3.2",
     "express-session": "1.15.6",
     "github": "11.0.0",
+    "mongodb": "4.1.4",
     "p-limit": "1.2.0",
     "passport": "0.4.0",
     "passport-github2": "0.1.12",
