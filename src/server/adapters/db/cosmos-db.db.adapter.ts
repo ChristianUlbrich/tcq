@@ -28,6 +28,6 @@ export async function createMeeting(meeting: Meeting) {
     return collection.storeDocumentAsync(meeting);
 }
 
-export async function getMeetingsCollection() {
+async function getMeetingsCollection() {
     return new docdb.Collection(COLLECTION_ID, DATABASE_ID, HOST, CDB_SECRET).openAsync();
 }
