@@ -16,7 +16,8 @@
     "start": "node dist/server/server.js | \"./node_modules/.bin/bunyan\"",
     "docker:build:backend": "docker run --rm -v .:/opt/build tc39/tcq-builder npm run build-backend",
     "docker:build:frontend": "docker run --rm -v .:/opt/build tc39/tcq-builder npm run build-frontend",
-    "docker:build:production": "docker run --rm -v .:/opt/build tc39/tcq-builder npm run build-production"
+    "docker:build:production": "docker run --rm -v .:/opt/build tc39/tcq-builder npm run build-production",
+    "postinstall": "node scripts/patch-whatwg-url.js"
   },
   "author": "Brian Terlson",
   "contributors": [
@@ -72,6 +73,7 @@
     "extract-text-webpack-plugin": "3.0.2",
     "html-webpack-plugin": "2.30.1",
     "node-sass": "4.11.0",
+    "replace-in-file": "7.2.0",
     "sass-loader": "6.0.6",
     "strict-event-emitter-types": "1.2.0",
     "style-loader": "0.19.0",

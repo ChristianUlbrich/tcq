@@ -5,7 +5,7 @@ RUN apt-get update && DEBIAN_FRONTEND=noninteractive TZ=Etc/UTC apt-get -y insta
 WORKDIR /opt/build
 COPY . ./
 
-RUN npm i && npm run build-production
+RUN npm install && npm run postinstall && npm run build-production
 
 FROM node:10.19-slim
 
