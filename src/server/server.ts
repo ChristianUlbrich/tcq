@@ -23,8 +23,8 @@ server.listen(port, function () {
 function getSessionStoreForSession(session: any) {
   // TODO: use nullish coalescing if available
   const SESSION_STORE_ADAPTER = process.env['TCQ_SESSION_STORE_ADAPTER'] ||
-  // due to historical reasons we default to cosmos-db on prod
-  process.env['NODE_ENV'] === 'production' ? 'cosmos-db' : 'none';
+      // due to historical reasons we default to cosmos-db on prod
+      (process.env['NODE_ENV'] === 'production' ? 'cosmos-db' : 'none');
   if (SESSION_STORE_ADAPTER === 'none') {
     return {
       // if no sessionStore adapter is provided, return an empty object, because this
