@@ -39,7 +39,7 @@ network:
 variables:                    # Pass environment variables as key value pairs.
   TCQ_GH_CALLBACK_URL: https://tcq.${COPILOT_ENVIRONMENT_NAME}.tcq-reloaded.tcq.ninja/auth/github/callback
   TCQ_DB_ADAPTER: mongodb
-  TCQ_SESSION_STORE_ADAPTER: none
+  TCQ_SESSION_STORE_ADAPTER: mongodb
 
 secrets:                      # Pass secrets from AWS Systems Manager (SSM) Parameter Store.
 #  GITHUB_TOKEN: GITHUB_TOKEN  # The key is the name of the environment variable, the value is the name of the SSM parameter.
@@ -47,6 +47,7 @@ secrets:                      # Pass secrets from AWS Systems Manager (SSM) Para
   TCQ_SESSION_SECRET: /copilot/${COPILOT_APPLICATION_NAME}/${COPILOT_ENVIRONMENT_NAME}/secrets/TCQ_SESSION_SECRET
   TCQ_GH_ID: /copilot/${COPILOT_APPLICATION_NAME}/${COPILOT_ENVIRONMENT_NAME}/secrets/TCQ_GH_ID
   TCQ_DB_MONGODB_URI: /copilot/${COPILOT_APPLICATION_NAME}/${COPILOT_ENVIRONMENT_NAME}/secrets/TCQ_DB_MONGODB_URI
+  TCQ_SESSION_STORE_MONGODB_URI: /copilot/${COPILOT_APPLICATION_NAME}/${COPILOT_ENVIRONMENT_NAME}/secrets/TCQ_DB_MONGODB_URI
 
 # You can override any of the values defined above by environment.
 #environments:
